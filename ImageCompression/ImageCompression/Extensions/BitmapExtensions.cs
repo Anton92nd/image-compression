@@ -7,7 +7,7 @@ using ImageCompression.Exceptions;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 
-namespace ImageCompression
+namespace ImageCompression.Extensions
 {
     public static class BitmapExtensions
     {

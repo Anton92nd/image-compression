@@ -16,5 +16,9 @@
         </Menu>
         <Image Name="LeftImageBox" Height="512" Width="512" Margin="0,29,612,130"/>
         <Image Name="RightImageBox" Height="512" Width="512" Margin="602,29,10,130"/>
+        <Button Name="ButtonApplyLeft" IsEnabled="False" Content="Apply to left" HorizontalAlignment="Left" Margin="251,568,0,0" VerticalAlignment="Top" Width="92" Click="ButtonApplyLeft_Click"/>
+        <Button Name="ButtonApplyRight" IsEnabled="False" Content="Apply to right" HorizontalAlignment="Left" Margin="251,595,0,0" VerticalAlignment="Top" Width="92" Click="ButtonApplyRight_OnClick"/>
+        <ComboBox Name="ComboBoxEffects" IsEditable="False" Loaded="ComboBoxEffects_OnLoaded" HorizontalAlignment="Left" Margin="46,593,0,0" VerticalAlignment="Top" Width="189"/>
+        <TextBlock HorizontalAlignment="Left" Height="23" Margin="46,565,0,0" TextWrapping="Wrap" Text="Choose effect:" VerticalAlignment="Top" Width="79"/>
     </Grid>
 </Window>
