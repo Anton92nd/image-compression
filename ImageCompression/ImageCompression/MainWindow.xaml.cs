@@ -31,6 +31,7 @@ namespace ImageCompression
             var openFile = new OpenFileDialog
             {
                 Multiselect = false,
+                Filter = "Image Files (*png, *.bmp, *.tiff, *.jpeg)|*.png;*.bmp;*.tiff;*.jpeg"
             };
             var result = openFile.ShowDialog();
             if (result.HasValue && result.Value)

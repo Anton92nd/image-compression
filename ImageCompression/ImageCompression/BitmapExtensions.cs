@@ -23,17 +23,19 @@ namespace ImageCompression
                 var saveFile = new SaveFileDialog
                 {
                     AddExtension = true,
-                    Filter = "Image Files (*png, *.bmp, *.jpg)|*.png;*.bmp;*.jpg",
+                    Filter = "Image Files (*png, *.bmp, *.tiff)|*.png;*.bmp;*.tiff",
                     DefaultExt = "png",
                 };
                 var result = saveFile.ShowDialog();
                 if (result.HasValue && result.Value)
                 {
                     var extension = GetExtension(saveFile.SafeFileName).ToLowerInvariant();
-                    if (extension.Equals("png") || extension.Equals("bmp"))
-                        image.SavePng(saveFile.FileName);
-                    else if (extension.Equals("jpg") || extension.Equals("jpeg"))
-                        image.SaveJpeg(saveFile.FileName);
+                    if (extension.Equals("png"))
+                        image.SaveWithEncoder(new PngBitmapEncoder(), saveFile.FileName);
+                    else if (extension.Equals("bmp"))
+                        image.SaveWithEncoder(new BmpBitmapEncoder(), saveFile.FileName);
+                    else if (extension.Equals("tiff"))
+                        image.SaveWithEncoder(new TiffBitmapEncoder(), saveFile.FileName);
                     else
                         throw new ExtensionNotSupportedException(string.Format("Extension '{0}' is not supported",
                             extension));
@@ -51,17 +53,7 @@ namespace ImageCompression
             return fileName.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries).Last();
         }
 
-        private static void SaveJpeg([NotNull] this BitmapImage image, [NotNull] string filePath)
-        {
-            SaveWithEncoder(image, new JpegBitmapEncoder(), filePath);
-        }
-
-        private static void SavePng([NotNull] this BitmapImage image, [NotNull] string filePath)
-        {
-            SaveWithEncoder(image, new PngBitmapEncoder(), filePath);
-        }
-
-        private static void SaveWithEncoder([NotNull] BitmapImage image, [NotNull] BitmapEncoder encoder, [NotNull] string filePath)
+        private static void SaveWithEncoder([NotNull] this BitmapImage image, [NotNull] BitmapEncoder encoder, [NotNull] string filePath)
         {
             encoder.Frames.Add(BitmapFrame.Create(image));
 
