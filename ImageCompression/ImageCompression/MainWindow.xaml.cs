@@ -21,17 +21,17 @@ namespace ImageCompression
             var image = LoadImage();
             if (image != null)
             {
-                LeftImage.Source = leftImage = image;
+                LeftImageBox.Source = leftImage = image;
             }
         }
 
         [CanBeNull]
-        private static BitmapImage LoadImage()
+        private static BitmapSource LoadImage()
         {
             var openFile = new OpenFileDialog
             {
                 Multiselect = false,
-                Filter = "Image Files (*png, *.bmp, *.tiff, *.jpeg)|*.png;*.bmp;*.tiff;*.jpeg"
+                Filter = "Image Files (*png, *.bmp, *.tiff, *.jpg, *jpeg)|*.png;*.bmp;*.tiff;*.jpeg;*.jpg"
             };
             var result = openFile.ShowDialog();
             if (result.HasValue && result.Value)
@@ -51,7 +51,7 @@ namespace ImageCompression
             var image = LoadImage();
             if (image != null)
             {
-                RightImage.Source = rightImage = image;
+                RightImageBox.Source = rightImage = image;
             }
         }
 
@@ -60,6 +60,7 @@ namespace ImageCompression
             rightImage.Save();
         }
 
-        private BitmapImage leftImage, rightImage;
+        private BitmapSource leftImage;
+        private BitmapSource rightImage;
     }
 }

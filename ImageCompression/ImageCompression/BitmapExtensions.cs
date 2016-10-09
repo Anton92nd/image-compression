@@ -11,7 +11,7 @@ namespace ImageCompression
 {
     public static class BitmapExtensions
     {
-        public static void Save([CanBeNull] this BitmapImage image)
+        public static void Save([CanBeNull] this BitmapSource image)
         {
             if (image == null)
             {
@@ -53,7 +53,7 @@ namespace ImageCompression
             return fileName.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries).Last();
         }
 
-        private static void SaveWithEncoder([NotNull] this BitmapImage image, [NotNull] BitmapEncoder encoder, [NotNull] string filePath)
+        private static void SaveWithEncoder([NotNull] this BitmapSource image, [NotNull] BitmapEncoder encoder, [NotNull] string filePath)
         {
             encoder.Frames.Add(BitmapFrame.Create(image));
 
