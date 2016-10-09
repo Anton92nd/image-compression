@@ -96,7 +96,7 @@ namespace ImageCompression
             var bytes = bitmap.GetBytes();
             for (var i = 0; i < bytes.Length; i += 4)
             {
-                var middle = 0.299 * bytes[i] + 0.587 * bytes[i + 1] + 0.114 * bytes[i + 2];
+                var middle = (77.0 / 256) * bytes[i] + (150.0 / 256) * bytes[i + 1] + (29.0 / 256) * bytes[i + 2];
                 bytes[i] = bytes[i + 1] = bytes[i + 2] = (byte)middle;
             }
             return BitmapSource.Create(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.DpiX, bitmap.DpiY, bitmap.Format,
