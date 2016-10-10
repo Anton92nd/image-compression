@@ -44,14 +44,14 @@ namespace ImageCompression
             var image = LoadImage();
             if (image != null)
             {
-                LeftImageBox.Source = leftImage = image;
+                LeftImageBox.Source = image;
                 ButtonApplyLeft.IsEnabled = true;
             }
         }
 
         private void MenuItem_Left_Save_OnClick(object sender, RoutedEventArgs e)
         {
-            leftImage.Save();
+            ((BitmapSource)LeftImageBox.Source).Save();
         }
 
         private void MenuItem_Right_Open_OnClick(object sender, RoutedEventArgs e)
@@ -59,18 +59,15 @@ namespace ImageCompression
             var image = LoadImage();
             if (image != null)
             {
-                RightImageBox.Source = rightImage = image;
+                RightImageBox.Source = image;
                 ButtonApplyRight.IsEnabled = true;
             }
         }
 
         private void MenuItem_Right_Save_OnClick(object sender, RoutedEventArgs e)
         {
-            rightImage.Save();
+            ((BitmapSource)RightImageBox.Source).Save();
         }
-
-        private BitmapSource leftImage;
-        private BitmapSource rightImage;
 
         private void ComboBoxEffects_OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -100,7 +97,7 @@ namespace ImageCompression
                 bytes[i] = bytes[i + 1] = bytes[i + 2] = (byte)middle;
             }
             return BitmapSource.Create(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.DpiX, bitmap.DpiY, bitmap.Format,
-                null, bytes, bitmap.PixelWidth * 4);
+                null, bytes, bitmap.PixelWidth * (bitmap.Format.BitsPerPixel / 8));
         }
 
         private BitmapSource ApplyMonochromeBad(BitmapSource bitmap)
@@ -112,17 +109,39 @@ namespace ImageCompression
                 bytes[i] = bytes[i + 1] = bytes[i + 2] = (byte)middle;
             }
             return BitmapSource.Create(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.DpiX, bitmap.DpiY, bitmap.Format,
-                null, bytes, bitmap.PixelWidth*4);
+                null, bytes, bitmap.PixelWidth*(bitmap.Format.BitsPerPixel / 8));
         }
 
         private void ButtonApplyLeft_Click(object sender, RoutedEventArgs e)
         {
-            LeftImageBox.Source = leftImage = ApplyEffect(leftImage, (EffectType) ComboBoxEffects.SelectedIndex);
+            LeftImageBox.Source = ApplyEffect((BitmapSource)LeftImageBox.Source, (EffectType) ComboBoxEffects.SelectedIndex);
         }
 
         private void ButtonApplyRight_OnClick(object sender, RoutedEventArgs e)
         {
-            RightImageBox.Source = rightImage = ApplyEffect(rightImage, (EffectType) ComboBoxEffects.SelectedIndex);
+            RightImageBox.Source = ApplyEffect((BitmapSource)RightImageBox.Source, (EffectType) ComboBoxEffects.SelectedIndex);
+        }
+
+        private void MenuItem_LeftToRight_OnClick(object sender, RoutedEventArgs e)
+        {
+            var bitmap = LeftImageBox.Source as BitmapSource;
+            if (bitmap == null)
+                return;
+            var bytes = bitmap.GetBytes();
+            RightImageBox.Source = BitmapSource.Create(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.DpiX, bitmap.DpiY, bitmap.Format,
+                null, bytes, bitmap.PixelWidth * (bitmap.Format.BitsPerPixel / 8));
+            ButtonApplyRight.IsEnabled = true;
+        }
+
+        private void MenuItem_RightToLeft_OnClick(object sender, RoutedEventArgs e)
+        {
+            var bitmap = RightImageBox.Source as BitmapSource;
+            if (bitmap == null)
+                return;
+            var bytes = bitmap.GetBytes();
+            LeftImageBox.Source = BitmapSource.Create(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.DpiX, bitmap.DpiY, bitmap.Format,
+                null, bytes, bitmap.PixelWidth * (bitmap.Format.BitsPerPixel / 8));
+            ButtonApplyLeft.IsEnabled = true;
         }
     }
 }

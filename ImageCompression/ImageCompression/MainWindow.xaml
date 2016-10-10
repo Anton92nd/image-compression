@@ -8,10 +8,12 @@
             <MenuItem Header="_Left">
                 <MenuItem Header="_Open image" Click="MenuItem_Left_Open_OnClick"/>
                 <MenuItem Header="_Save image" Click="MenuItem_Left_Save_OnClick"/>
+                <MenuItem Header="_Copy to right" Click="MenuItem_LeftToRight_OnClick"/>
             </MenuItem>
             <MenuItem Header="_Right">
                 <MenuItem Header="_Open image" Click="MenuItem_Right_Open_OnClick"/>
                 <MenuItem Header="_Save image" Click="MenuItem_Right_Save_OnClick"/>
+                <MenuItem Header="_Copy to left" Click="MenuItem_RightToLeft_OnClick"/>
             </MenuItem>
         </Menu>
         <Image Name="LeftImageBox" Height="512" Width="512" Margin="0,29,612,130"/>
