@@ -6,20 +6,25 @@
     <Grid>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_Left">
+                <MenuItem Header="_Copy to right" Click="MenuItem_LeftToRight_OnClick"/>
                 <MenuItem Header="_Open image" Click="MenuItem_Left_Open_OnClick"/>
                 <MenuItem Header="_Save image" Click="MenuItem_Left_Save_OnClick"/>
-                <MenuItem Header="_Copy to right" Click="MenuItem_LeftToRight_OnClick"/>
             </MenuItem>
             <MenuItem Header="_Right">
+                <MenuItem Header="_Copy to left" Click="MenuItem_RightToLeft_OnClick"/>
                 <MenuItem Header="_Open image" Click="MenuItem_Right_Open_OnClick"/>
                 <MenuItem Header="_Save image" Click="MenuItem_Right_Save_OnClick"/>
-                <MenuItem Header="_Copy to left" Click="MenuItem_RightToLeft_OnClick"/>
             </MenuItem>
         </Menu>
-        <Image Name="LeftImageBox" Height="512" Width="512" Margin="0,29,612,130"/>
-        <Image Name="RightImageBox" Height="512" Width="512" Margin="602,29,10,130"/>
-        <Button Name="ButtonApplyLeft" IsEnabled="False" Content="Apply to left" HorizontalAlignment="Left" Margin="251,568,0,0" VerticalAlignment="Top" Width="92" Click="ButtonApplyLeft_Click"/>
-        <Button Name="ButtonApplyRight" IsEnabled="False" Content="Apply to right" HorizontalAlignment="Left" Margin="251,595,0,0" VerticalAlignment="Top" Width="92" Click="ButtonApplyRight_OnClick"/>
+        <Border BorderThickness="1" BorderBrush="Black" Margin="10,29,612,130">
+            <Image Name="LeftImageBox" Height="512" Width="512" />
+        </Border>
+        <Border BorderThickness="1" BorderBrush="Black" Margin="602,29,10,130">
+            <Image Name="RightImageBox" Height="512" Width="512" />
+        </Border>
+        <Button Name="ButtonApplyLeft" IsEnabled="False" Content="Apply to left" HorizontalAlignment="Left" Margin="251,568,0,0" VerticalAlignment="Top" Width="92" Click="ButtonApplyLeft_Click" IsEnabledChanged="ButtonApply_OnIsEnabledChanged"/>
+        <Button Name="ButtonApplyRight" IsEnabled="False" Content="Apply to right" HorizontalAlignment="Left" Margin="251,595,0,0" VerticalAlignment="Top" Width="92" Click="ButtonApplyRight_OnClick" IsEnabledChanged="ButtonApply_OnIsEnabledChanged"/>
+        <Button Name="ButtonPSNR" IsEnabled="False" Content="PSNR" HorizontalAlignment="Left" Margin="512,239,0,0" VerticalAlignment="Top" Width="80" Click="ButtonPSNR_OnClick"/>
         <ComboBox Name="ComboBoxEffects" IsEditable="False" Loaded="ComboBoxEffects_OnLoaded" HorizontalAlignment="Left" Margin="46,593,0,0" VerticalAlignment="Top" Width="189"/>
         <TextBlock HorizontalAlignment="Left" Height="23" Margin="46,565,0,0" TextWrapping="Wrap" Text="Choose effect:" VerticalAlignment="Top" Width="79"/>
     </Grid>
