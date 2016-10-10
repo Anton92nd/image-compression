@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ImageCompression.Extensions;
 using JetBrains.Annotations;
@@ -77,18 +79,34 @@ namespace ImageCompression
             ComboBoxEffects.SelectedIndex = 0;
         }
 
-        private BitmapSource ApplyEffect(BitmapSource bitmap, EffectType effectType)
+        private bool ApplyEffect(BitmapSource bitmap, EffectType effectType, out BitmapSource result)
         {
+            if (!supportedFormats[effectType].Contains(bitmap.Format))
+            {
+                MessageBox.Show("This effect is not supported for that image", "Error", MessageBoxButton.OK,
+                    MessageBoxImage.Exclamation);
+                result = null;
+                return false;
+            }
             switch (effectType)
             {
                 case EffectType.MonochromeBad:
-                    return ApplyMonochromeBad(bitmap);
+                    result = ApplyMonochromeBad(bitmap);
+                    break;
                 case EffectType.MonochromeGood:
-                    return ApplyMonochromeGood(bitmap);
+                    result = ApplyMonochromeGood(bitmap);
+                    break;
                 default:
                     throw new Exception(string.Format("Unknown effect type: {0}", effectType));
             }
+            return true;
         }
+
+        private static Dictionary<EffectType, PixelFormat[]> supportedFormats = new Dictionary<EffectType, PixelFormat[]>
+        {
+            {EffectType.MonochromeBad, new []{PixelFormats.Bgr32}},
+            {EffectType.MonochromeGood, new []{PixelFormats.Bgr32}},
+        };
 
         private BitmapSource ApplyMonochromeGood(BitmapSource bitmap)
         {
@@ -116,12 +134,16 @@ namespace ImageCompression
 
         private void ButtonApplyLeft_Click(object sender, RoutedEventArgs e)
         {
-            LeftImageBox.Source = ApplyEffect((BitmapSource)LeftImageBox.Source, (EffectType) ComboBoxEffects.SelectedIndex);
+            BitmapSource source;
+            if (ApplyEffect((BitmapSource)LeftImageBox.Source, (EffectType)ComboBoxEffects.SelectedIndex, out source))
+                LeftImageBox.Source = source;
         }
 
         private void ButtonApplyRight_OnClick(object sender, RoutedEventArgs e)
         {
-            RightImageBox.Source = ApplyEffect((BitmapSource)RightImageBox.Source, (EffectType) ComboBoxEffects.SelectedIndex);
+            BitmapSource source;
+            if (ApplyEffect((BitmapSource)RightImageBox.Source, (EffectType)ComboBoxEffects.SelectedIndex, out source))
+                RightImageBox.Source = source;
         }
 
         private void MenuItem_LeftToRight_OnClick(object sender, RoutedEventArgs e)
