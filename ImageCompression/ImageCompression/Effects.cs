@@ -43,7 +43,7 @@ namespace ImageCompression
             var yCbCr = TransformYCbCr(bytes);
             for (var i = 0; i < bytes.Length; i += 4)
             {
-                bytes[i] = bytes[i + 1] = bytes[i + 2] = yCbCr[i].Item3;
+                bytes[i] = bytes[i + 1] = bytes[i + 2] = yCbCr[i / 4].Item3;
             }
             return CreateBitmap(bitmap, bytes);
         }
@@ -54,7 +54,7 @@ namespace ImageCompression
             var yCbCr = TransformYCbCr(bytes);
             for (var i = 0; i < bytes.Length; i += 4)
             {
-                bytes[i] = bytes[i + 1] = bytes[i + 2] = yCbCr[i].Item2;
+                bytes[i] = bytes[i + 1] = bytes[i + 2] = yCbCr[i / 4].Item2;
             }
             return CreateBitmap(bitmap, bytes);
         }
@@ -65,7 +65,7 @@ namespace ImageCompression
             var yCbCr = TransformYCbCr(bytes);
             for (var i = 0; i < bytes.Length; i += 4)
             {
-                bytes[i] = bytes[i + 1] = bytes[i + 2] = yCbCr[i].Item1;
+                bytes[i] = bytes[i + 1] = bytes[i + 2] = yCbCr[i / 4].Item1;
             }
             return CreateBitmap(bitmap, bytes);
         }
@@ -89,7 +89,7 @@ namespace ImageCompression
             {EffectType.GrayscaleGood, ApplyMonochromeGood},
             {EffectType.Y, ApplyMonochromeY},
             {EffectType.Cb, ApplyMonochromeCb},
-            {EffectType.Cb, ApplyMonochromeCr},
+            {EffectType.Cr, ApplyMonochromeCr},
         };
 
         public static bool CanApply(BitmapSource bitmap, EffectType effectType)
