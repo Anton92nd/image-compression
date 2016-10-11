@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using ImageCompression.Extensions;
+using ImageCompression.Structures;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 
@@ -44,6 +46,9 @@ namespace ImageCompression
             {
                 LeftImageBox.Source = image;
                 ButtonApplyLeft.IsEnabled = true;
+                leftHistory.Add(image);
+                MenuUndoLeft.IsEnabled = leftHistory.Count > 1;
+                MenuRedoLeft.IsEnabled = false;
             }
         }
 
@@ -59,6 +64,9 @@ namespace ImageCompression
             {
                 RightImageBox.Source = image;
                 ButtonApplyRight.IsEnabled = true;
+                rightHistory.Add(image);
+                MenuUndoRight.IsEnabled = rightHistory.Count > 1;
+                MenuRedoRight.IsEnabled = false;
             }
         }
 
@@ -89,15 +97,25 @@ namespace ImageCompression
         private void ButtonApplyLeft_Click(object sender, RoutedEventArgs e)
         {
             BitmapSource source;
-            if (ApplyEffect((BitmapSource)LeftImageBox.Source, (EffectType)ComboBoxEffects.SelectedIndex, out source))
+            if (ApplyEffect((BitmapSource) LeftImageBox.Source, (EffectType) ComboBoxEffects.SelectedIndex, out source))
+            {
                 LeftImageBox.Source = source;
+                leftHistory.Add(source);
+                MenuRedoLeft.IsEnabled = false;
+                MenuUndoLeft.IsEnabled = true;
+            }
         }
 
         private void ButtonApplyRight_OnClick(object sender, RoutedEventArgs e)
         {
             BitmapSource source;
-            if (ApplyEffect((BitmapSource)RightImageBox.Source, (EffectType)ComboBoxEffects.SelectedIndex, out source))
+            if (ApplyEffect((BitmapSource) RightImageBox.Source, (EffectType) ComboBoxEffects.SelectedIndex, out source))
+            {
                 RightImageBox.Source = source;
+                rightHistory.Add(source);
+                MenuRedoRight.IsEnabled = false;
+                MenuUndoRight.IsEnabled = true;
+            }
         }
 
         private void MenuItem_LeftToRight_OnClick(object sender, RoutedEventArgs e)
@@ -105,9 +123,12 @@ namespace ImageCompression
             var bitmap = LeftImageBox.Source as BitmapSource;
             if (bitmap == null)
                 return;
-            var bytes = bitmap.GetBytes();
-            RightImageBox.Source = bitmap.Create(bytes);
+            var newBitmap = bitmap.Create(bitmap.GetBytes());
+            RightImageBox.Source = newBitmap;
             ButtonApplyRight.IsEnabled = true;
+            rightHistory.Add(newBitmap);
+            MenuRedoRight.IsEnabled = false;
+            MenuUndoRight.IsEnabled = rightHistory.Count > 1;
         }
 
         private void MenuItem_RightToLeft_OnClick(object sender, RoutedEventArgs e)
@@ -115,9 +136,12 @@ namespace ImageCompression
             var bitmap = RightImageBox.Source as BitmapSource;
             if (bitmap == null)
                 return;
-            var bytes = bitmap.GetBytes();
-            LeftImageBox.Source = bitmap.Create(bytes);
+            var newBitmap = bitmap.Create(bitmap.GetBytes());
+            LeftImageBox.Source = newBitmap;
             ButtonApplyLeft.IsEnabled = true;
+            leftHistory.Add(newBitmap);
+            MenuUndoLeft.IsEnabled = leftHistory.Count > 1;
+            MenuRedoLeft.IsEnabled = false;
         }
 
         private void ButtonPSNR_OnClick(object sender, RoutedEventArgs e)
@@ -155,5 +179,44 @@ namespace ImageCompression
             if (ButtonApplyLeft.IsEnabled && ButtonApplyRight.IsEnabled)
                 ButtonPSNR.IsEnabled = true;
         }
+
+        private void MenuItem_UndoLeft_Click(object sender, RoutedEventArgs e)
+        {
+            leftHistory.Pop();
+            if (leftHistory.Count == 1)
+                MenuUndoLeft.IsEnabled = false;
+            LeftImageBox.Source = leftHistory.Current();
+            MenuRedoLeft.IsEnabled = true;
+        }
+
+        private void MenuItem_RedoLeft_Click(object sender, RoutedEventArgs e)
+        {
+            leftHistory.Unpop();
+            if (leftHistory.IsAtHead())
+                MenuRedoLeft.IsEnabled = false;
+            LeftImageBox.Source = leftHistory.Current();
+            MenuUndoLeft.IsEnabled = true;
+        }
+
+        private void MenuItem_UndoRight_Click(object sender, RoutedEventArgs e)
+        {
+            rightHistory.Pop();
+            if (rightHistory.Count == 1)
+                MenuUndoRight.IsEnabled = false;
+            RightImageBox.Source = rightHistory.Current();
+            MenuRedoRight.IsEnabled = true;
+        }
+
+        private void MenuItem_RedoRight_Click(object sender, RoutedEventArgs e)
+        {
+            rightHistory.Unpop();
+            if (rightHistory.IsAtHead())
+                MenuRedoRight.IsEnabled = false;
+            RightImageBox.Source = rightHistory.Current();
+            MenuUndoRight.IsEnabled = true;
+        }
+
+        private readonly PersistentStack<BitmapSource> leftHistory = new PersistentStack<BitmapSource>();
+        private readonly PersistentStack<BitmapSource> rightHistory = new PersistentStack<BitmapSource>();
     }
 }

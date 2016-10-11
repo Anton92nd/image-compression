@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ImageCompression.Structures;
 using JetBrains.Annotations;
 
 namespace ImageCompression.Extensions

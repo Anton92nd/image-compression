@@ -9,11 +9,15 @@
                 <MenuItem Header="_Copy to right" Click="MenuItem_LeftToRight_OnClick"/>
                 <MenuItem Header="_Open image" Click="MenuItem_Left_Open_OnClick"/>
                 <MenuItem Header="_Save image" Click="MenuItem_Left_Save_OnClick"/>
+                <MenuItem Header="_Undo" Name="MenuUndoLeft" IsEnabled="False" Click="MenuItem_UndoLeft_Click"/>
+                <MenuItem Header="_Redo" Name="MenuRedoLeft" IsEnabled="False" Click="MenuItem_RedoLeft_Click"/>
             </MenuItem>
             <MenuItem Header="_Right">
                 <MenuItem Header="_Copy to left" Click="MenuItem_RightToLeft_OnClick"/>
                 <MenuItem Header="_Open image" Click="MenuItem_Right_Open_OnClick"/>
                 <MenuItem Header="_Save image" Click="MenuItem_Right_Save_OnClick"/>
+                <MenuItem Header="_Undo" Name="MenuUndoRight" IsEnabled="False" Click="MenuItem_UndoRight_Click"/>
+                <MenuItem Header="_Redo" Name="MenuRedoRight" IsEnabled="False" Click="MenuItem_RedoRight_Click"/>
             </MenuItem>
         </Menu>
         <Border BorderThickness="1" BorderBrush="Black" Margin="10,29,612,130">
