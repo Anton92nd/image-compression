@@ -2,10 +2,19 @@
 {
     public enum EffectType
     {
-        [Text("Monochrome (bad)")]
-        MonochromeBad,
+        [Text("Grayscale (bad)")]
+        GrayscaleBad,
 
-        [Text("Monochrome (good)")]
-        MonochromeGood,
+        [Text("Grayscale (good)")]
+        GrayscaleGood,
+
+        [Text("Y")]
+        Y,
+
+        [Text("Cb")]
+        Cb,
+
+        [Text("Cr")]
+        Cr,
     }
 }

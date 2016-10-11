@@ -10,7 +10,11 @@ namespace ImageCompression.Extensions
         [NotNull]
         public static string GetText<T>([NotNull] this T element)
         {
-            return element.ToString();
+            if (!typeof(T).IsEnum)
+                throw new Exception(string.Format("Type '{0}' is not enum", typeof(T).Name));
+            var memberInfo = typeof(T).GetMember(element.ToString()).First();
+            var attr = memberInfo.GetCustomAttributes(typeof(TextAttribute), false).Cast<TextAttribute>().Single();
+            return attr.Text;
         }
 
         public static IEnumerable<T> GetEnumValues<T>([NotNull] this Type enumType)
