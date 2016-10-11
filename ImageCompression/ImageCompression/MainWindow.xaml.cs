@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ImageCompression.Extensions;
 using JetBrains.Annotations;
@@ -112,8 +106,7 @@ namespace ImageCompression
             if (bitmap == null)
                 return;
             var bytes = bitmap.GetBytes();
-            RightImageBox.Source = BitmapSource.Create(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.DpiX, bitmap.DpiY, bitmap.Format,
-                null, bytes, bitmap.PixelWidth * (bitmap.Format.BitsPerPixel / 8));
+            RightImageBox.Source = bitmap.Create(bytes);
             ButtonApplyRight.IsEnabled = true;
         }
 
@@ -123,8 +116,7 @@ namespace ImageCompression
             if (bitmap == null)
                 return;
             var bytes = bitmap.GetBytes();
-            LeftImageBox.Source = BitmapSource.Create(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.DpiX, bitmap.DpiY, bitmap.Format,
-                null, bytes, bitmap.PixelWidth * (bitmap.Format.BitsPerPixel / 8));
+            LeftImageBox.Source = bitmap.Create(bytes);
             ButtonApplyLeft.IsEnabled = true;
         }
 

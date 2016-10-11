@@ -8,13 +8,13 @@
         [Text("Grayscale (good)")]
         GrayscaleGood,
 
-        [Text("Y")]
+        [Text("Grayscale Y")]
         Y,
 
-        [Text("Cb")]
+        [Text("Grayscale Cb")]
         Cb,
 
-        [Text("Cr")]
+        [Text("Grayscale Cr")]
         Cr,
     }
 }

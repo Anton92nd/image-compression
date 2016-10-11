@@ -11,79 +11,58 @@ namespace ImageCompression
     {
         public static BitmapSource ApplyMonochromeGood(BitmapSource bitmap)
         {
-            var bytes = bitmap.GetBytes();
-            for (var i = 0; i < bytes.Length; i += 4)
-            {
-                var middle = (77 * bytes[i] + 150 * bytes[i + 1] + 29 * bytes[i + 2]) >> 8;
-                bytes[i] = bytes[i + 1] = bytes[i + 2] = (byte)middle;
-            }
-            return CreateBitmap(bitmap, bytes);
+            return bitmap.Create(bitmap
+                .GetColors()
+                .Select(v => (byte)((v[0]*77 + v[1]*150 + v[2]*29) >> 8))
+                .Select(c => new Vector(new []{c, c, c}))
+                .ToArray());
         }
 
         public static BitmapSource ApplyMonochromeBad(BitmapSource bitmap)
         {
-            var bytes = bitmap.GetBytes();
-            for (var i = 0; i < bytes.Length; i += 4)
-            {
-                var middle = (bytes[i] + bytes[i + 1] + bytes[i + 2]) / 3;
-                bytes[i] = bytes[i + 1] = bytes[i + 2] = (byte)middle;
-            }
-            return CreateBitmap(bitmap, bytes);
-        }
-
-        private static BitmapSource CreateBitmap(BitmapSource bitmap, byte[] bytes)
-        {
-            return BitmapSource.Create(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.DpiX, bitmap.DpiY, bitmap.Format,
-                null, bytes, bitmap.PixelWidth*(bitmap.Format.BitsPerPixel/8));
+            return bitmap.Create(bitmap
+                .GetColors()
+                .Select(v => (byte)((v[0]+v[1]+v[2])/3))
+                .Select(c => new Vector(new[] { c, c, c }))
+                .ToArray());
         }
 
         public static BitmapSource ApplyMonochromeCr(BitmapSource bitmap)
         {
-            var bytes = bitmap.GetBytes();
-            var yCbCr = TransformYCbCr(bytes);
-            for (var i = 0; i < bytes.Length; i += 4)
-            {
-                bytes[i] = bytes[i + 1] = bytes[i + 2] = yCbCr[i / 4].Item3;
-            }
-            return CreateBitmap(bitmap, bytes);
+            return bitmap.Create(TransformYCbCr(bitmap.GetColors())
+                .Select(v => new Vector(new[] { v[2], v[2], v[2] }))
+                .ToArray());
         }
 
         public static BitmapSource ApplyMonochromeCb(BitmapSource bitmap)
         {
-            var bytes = bitmap.GetBytes();
-            var yCbCr = TransformYCbCr(bytes);
-            for (var i = 0; i < bytes.Length; i += 4)
-            {
-                bytes[i] = bytes[i + 1] = bytes[i + 2] = yCbCr[i / 4].Item2;
-            }
-            return CreateBitmap(bitmap, bytes);
+            return bitmap.Create(TransformYCbCr(bitmap.GetColors())
+                .Select(v => new Vector(new[] { v[1], v[1], v[1] }))
+                .ToArray());
         }
 
         public static BitmapSource ApplyMonochromeY(BitmapSource bitmap)
         {
-            var bytes = bitmap.GetBytes();
-            var yCbCr = TransformYCbCr(bytes);
-            for (var i = 0; i < bytes.Length; i += 4)
-            {
-                bytes[i] = bytes[i + 1] = bytes[i + 2] = yCbCr[i / 4].Item1;
-            }
-            return CreateBitmap(bitmap, bytes);
+            return bitmap.Create(TransformYCbCr(bitmap.GetColors())
+                .Select(v => new Vector(new[] {v[0], v[0], v[0]}))
+                .ToArray());
         }
 
-        private static Tuple<byte, byte, byte>[] TransformYCbCr(byte[] bytes)
+        private static Vector[] TransformYCbCr(Vector[] colors)
         {
-            var result = new Tuple<byte, byte, byte>[bytes.Length/4];
-            for (var i = 0; i < bytes.Length; i += 4)
+            var result = new Vector[colors.Length];
+            for (var i = 0; i < colors.Length; i++)
             {
-                var y = (byte)((77*bytes[i] + 150*bytes[i + 1] + 29*bytes[i + 2]) >> 8);
-                var cb = (byte) (((-43*bytes[i] - 85*bytes[i + 1] + 128*bytes[i + 2]) >> 8) + (1 << 7));
-                var cr = (byte)((((1 << 7)*bytes[i] - 107*bytes[i + 1] - 21*bytes[i + 2]) >> 8) + (1 << 7));
-                result[i / 4] = new Tuple<byte, byte, byte>(y, cb, cr);
+                var y = (byte) ((77*colors[i][0] + 150*colors[i][1] + 29*colors[i][2]) >> 8);
+                var cb = (byte) (((-43*colors[i][0] - 85*colors[i][1] + 128*colors[i][2]) >> 8) + (1 << 7));
+                var cr = (byte) ((((1 << 7)*colors[i][0] - 107*colors[i][1] - 21*colors[i][2]) >> 8) + (1 << 7));
+                result[i] = new Vector(new[] {y, cb, cr});
             }
             return result;
         }
 
-        public static readonly Dictionary<EffectType, Func<BitmapSource, BitmapSource>> EffectByType = new Dictionary<EffectType, Func<BitmapSource, BitmapSource>>
+        public static readonly Dictionary<EffectType, Func<BitmapSource, BitmapSource>> EffectByType = new Dictionary
+            <EffectType, Func<BitmapSource, BitmapSource>>
         {
             {EffectType.GrayscaleBad, ApplyMonochromeBad},
             {EffectType.GrayscaleGood, ApplyMonochromeGood},
@@ -94,17 +73,19 @@ namespace ImageCompression
 
         public static bool CanApply(BitmapSource bitmap, EffectType effectType)
         {
-            return SupportedFormats.ContainsKey(effectType) && SupportedFormats[effectType].ToList().Contains(bitmap.Format) &&
+            return SupportedFormats.ContainsKey(effectType) &&
+                   SupportedFormats[effectType].ToList().Contains(bitmap.Format) &&
                    EffectByType.ContainsKey(effectType);
         }
 
-        private static readonly Dictionary<EffectType, PixelFormat[]> SupportedFormats = new Dictionary<EffectType, PixelFormat[]>
+        private static readonly Dictionary<EffectType, PixelFormat[]> SupportedFormats = new Dictionary
+            <EffectType, PixelFormat[]>
         {
-            {EffectType.GrayscaleBad, new []{PixelFormats.Bgr32}},
-            {EffectType.GrayscaleGood, new []{PixelFormats.Bgr32}},
-            {EffectType.Y, new []{PixelFormats.Bgr32}},
-            {EffectType.Cb, new []{PixelFormats.Bgr32}},
-            {EffectType.Cr, new []{PixelFormats.Bgr32}},
+            {EffectType.GrayscaleBad, new[] {PixelFormats.Bgr32}},
+            {EffectType.GrayscaleGood, new[] {PixelFormats.Bgr32}},
+            {EffectType.Y, new[] {PixelFormats.Bgr32}},
+            {EffectType.Cb, new[] {PixelFormats.Bgr32}},
+            {EffectType.Cr, new[] {PixelFormats.Bgr32}},
         };
     }
 }
