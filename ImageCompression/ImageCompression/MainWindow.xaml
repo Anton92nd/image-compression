@@ -4,7 +4,7 @@
         Title="Image compression" Height="700" Width="1130" WindowStyle="SingleBorderWindow" ResizeMode="CanMinimize"  
     WindowStartupLocation="CenterScreen">
     <Grid>
-        <Menu DockPanel.Dock="Top">
+        <Menu DockPanel.Dock="Top" Margin="0,0,0,642">
             <MenuItem Header="_Left">
                 <MenuItem Header="_Copy to right" Click="MenuItem_LeftToRight_OnClick"/>
                 <MenuItem Header="_Open image" Click="MenuItem_Left_Open_OnClick"/>
@@ -29,7 +29,9 @@
         <Button Name="ButtonApplyLeft" IsEnabled="False" Content="Apply to left" HorizontalAlignment="Left" Margin="251,568,0,0" VerticalAlignment="Top" Width="92" Click="ButtonApplyLeft_Click" IsEnabledChanged="ButtonApply_OnIsEnabledChanged"/>
         <Button Name="ButtonApplyRight" IsEnabled="False" Content="Apply to right" HorizontalAlignment="Left" Margin="251,595,0,0" VerticalAlignment="Top" Width="92" Click="ButtonApplyRight_OnClick" IsEnabledChanged="ButtonApply_OnIsEnabledChanged"/>
         <Button Name="ButtonPSNR" IsEnabled="False" Content="PSNR" HorizontalAlignment="Left" Margin="512,239,0,0" VerticalAlignment="Top" Width="80" Click="ButtonPSNR_OnClick"/>
-        <ComboBox Name="ComboBoxEffects" IsEditable="False" Loaded="ComboBoxEffects_OnLoaded" HorizontalAlignment="Left" Margin="46,593,0,0" VerticalAlignment="Top" Width="189"/>
+        <ComboBox Name="ComboBoxEffects" IsEditable="False" Loaded="ComboBoxEffects_OnLoaded" HorizontalAlignment="Left" Margin="46,595,0,0" VerticalAlignment="Top" Width="189" SelectionChanged="ComboBoxEffects_OnSelectionChanged"/>
         <TextBlock HorizontalAlignment="Left" Height="23" Margin="46,565,0,0" TextWrapping="Wrap" Text="Choose effect:" VerticalAlignment="Top" Width="79"/>
+        <ComboBox Name="EffectParameterComboBox" Visibility="Hidden" IsEditable="True" HorizontalAlignment="Left" Height="23" Margin="115,620,0,0" VerticalAlignment="Top" Width="120"/>
+        <TextBlock Name="EffectParameterTextBlock" Visibility="Hidden" HorizontalAlignment="Left" Margin="46,620,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="23" Width="64"/>
     </Grid>
 </Window>

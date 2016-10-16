@@ -58,10 +58,11 @@ namespace ImageCompression
             return bitmap.Create(back);
         }
 
-        public static BitmapSource ApplyMedianCut1024(BitmapSource bitmap)
+        public static BitmapSource ApplyMedianCut(BitmapSource bitmap, object parameter)
         {
-            Vector<byte>[] pallet;
-            return bitmap.Create(MedianCut.Build(1024, bitmap.GetColors(), out pallet));
+            var paletteSize = int.Parse((string)parameter);
+            Vector<byte>[] palette;
+            return bitmap.Create(MedianCut.Build(paletteSize, bitmap.GetColors(), out palette));
         }
 
         private static Vector<byte>[] TransformRGBToYCbCr(Vector<byte>[] colors)
@@ -84,22 +85,22 @@ namespace ImageCompression
             {
                 var r = (byte) Math.Max(0, colors[i][0] + ((colors[i][2] - 128) << 8) / 183);
                 var g = (byte) Math.Max(0, colors[i][0] - (5329 * (colors[i][1] - 128) + 11103 * (colors[i][2] - 128)) / 15481);
-                var b = (byte) Math.Max(0, colors[i][0] + ((colors[i][1] - 128) * 256) / 144);
+                var b = (byte) Math.Max(0, colors[i][0] + ((colors[i][1] - 128) << 8) / 144);
                 result[i] = new Vector<byte>(new[] { r, g, b });
             }
             return result;
         }
 
-        public static readonly Dictionary<EffectType, Func<BitmapSource, BitmapSource>> EffectByType = new Dictionary
-            <EffectType, Func<BitmapSource, BitmapSource>>
+        public static readonly Dictionary<EffectType, Func<BitmapSource, object, BitmapSource>> EffectByType = new Dictionary
+            <EffectType, Func<BitmapSource, object, BitmapSource>>
         {
-            {EffectType.GrayscaleBad, ApplyMonochromeBad},
-            {EffectType.GrayscaleGood, ApplyMonochromeGood},
-            {EffectType.Y, ApplyMonochromeY},
-            {EffectType.Cb, ApplyMonochromeCb},
-            {EffectType.Cr, ApplyMonochromeCr},
-            {EffectType.ToYCbCrAndBack, ApplyToYCbCrAndBack},
-            {EffectType.MedianCut, ApplyMedianCut1024},
+            {EffectType.GrayscaleBad, (b, p) => ApplyMonochromeBad(b)},
+            {EffectType.GrayscaleGood, (b, p) => ApplyMonochromeGood(b)},
+            {EffectType.Y, (b, p) => ApplyMonochromeY(b)},
+            {EffectType.Cb, (b, p) => ApplyMonochromeCb(b)},
+            {EffectType.Cr, (b, p) => ApplyMonochromeCr(b)},
+            {EffectType.ToYCbCrAndBack, (b, p) => ApplyToYCbCrAndBack(b)},
+            {EffectType.MedianCut, (b, p) => ApplyMedianCut(b, p)},
         };
 
         public static bool CanApply(BitmapSource bitmap, EffectType effectType)

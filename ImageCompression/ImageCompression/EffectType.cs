@@ -1,4 +1,6 @@
-﻿namespace ImageCompression
+﻿using ImageCompression.Attributes;
+
+namespace ImageCompression
 {
     public enum EffectType
     {
@@ -20,7 +22,8 @@
         [Text("To [Y, Cb, Cr] and back")]
         ToYCbCrAndBack,
 
-        [Text("Median cut (1024)")]
+        [Text("Median cut")]
+        [Parameter("Palette size:", 1024)]
         MedianCut,
     }
 }

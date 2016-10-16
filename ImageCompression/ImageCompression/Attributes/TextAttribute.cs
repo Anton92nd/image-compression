@@ -1,9 +1,9 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace ImageCompression
+namespace ImageCompression.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
     public class TextAttribute : Attribute
     {
         public string Text { get; private set; }

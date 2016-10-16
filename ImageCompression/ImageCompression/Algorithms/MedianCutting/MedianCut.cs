@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using ImageCompression.Structures;
+using JetBrains.Annotations;
 
 namespace ImageCompression.Algorithms.MedianCutting
 {
     public static class MedianCut
     {
-        public static Vector<byte>[] Build(int palletSize, IList<Vector<byte>> colors, out Vector<byte>[] pallet)
+        [NotNull]
+        public static Vector<byte>[] Build(int palletSize, [NotNull] IList<Vector<byte>> colors, out Vector<byte>[] pallet)
         {
             if ((palletSize & (palletSize - 1)) != 0)
                 throw new Exception("Pallet size must be power of 2");
@@ -35,7 +37,7 @@ namespace ImageCompression.Algorithms.MedianCutting
             return colors.Select(color => FindColor(stats, root, color)).ToArray();
         }
 
-        private static Vector<byte> FindColor(int[][] stats, MCNode mcNode, Vector<byte> color)
+        private static Vector<byte> FindColor([NotNull] int[][] stats, [NotNull] MCNode mcNode, Vector<byte> color)
         {
             if (mcNode.L == null)
                 return GetCubeMedian(stats, mcNode.Cube);
@@ -44,7 +46,7 @@ namespace ImageCompression.Algorithms.MedianCutting
             return FindColor(stats, mcNode.R, color);
         }
 
-        private static Vector<byte> GetCubeMedian(int[][] stats, Cube cube)
+        private static Vector<byte> GetCubeMedian([NotNull] int[][] stats, Cube cube)
         {
             var indexR = BinarySearch(stats[0], cube.Ox);
             var indexG = BinarySearch(stats[1], cube.Oy);
@@ -52,7 +54,7 @@ namespace ImageCompression.Algorithms.MedianCutting
             return new Vector<byte>(new []{(byte)indexR, (byte)indexG, (byte)indexB});
         }
 
-        private static int BinarySearch(int[] array, Segment segment)
+        private static int BinarySearch([NotNull] int[] array, Segment segment)
         {
             int l = segment.Start, r = segment.End;
             var toFind = (array[l] + array[r])/2;
@@ -67,7 +69,7 @@ namespace ImageCompression.Algorithms.MedianCutting
             return l;
         }
 
-        private static void SplitCube(int[][] stats, Cube cube, out Cube cube1, out Cube cube2)
+        private static void SplitCube([NotNull] int[][] stats, Cube cube, out Cube cube1, out Cube cube2)
         {
             if (cube.Ox.Length >= cube.Oy.Length && cube.Ox.Length >= cube.Oz.Length)
             {
@@ -89,8 +91,8 @@ namespace ImageCompression.Algorithms.MedianCutting
             }
         }
 
-
-        private static int[][] GetStatistics(IList<Vector<byte>> colors, out Cube cube)
+        [NotNull]
+        private static int[][] GetStatistics([NotNull] IList<Vector<byte>> colors, out Cube cube)
         {
             var counts = new int[3][];
             counts[0] = new int[256];

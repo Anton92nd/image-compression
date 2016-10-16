@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using ImageCompression.Extensions;
 using ImageCompression.Structures;
@@ -53,7 +54,7 @@ namespace ImageCompression
 
         private void MenuItem_Left_Save_OnClick(object sender, RoutedEventArgs e)
         {
-            ((BitmapSource)LeftImageBox.Source).Save();
+            ((BitmapSource) LeftImageBox.Source).Save();
         }
 
         private void MenuItem_Right_Open_OnClick(object sender, RoutedEventArgs e)
@@ -71,7 +72,7 @@ namespace ImageCompression
 
         private void MenuItem_Right_Save_OnClick(object sender, RoutedEventArgs e)
         {
-            ((BitmapSource)RightImageBox.Source).Save();
+            ((BitmapSource) RightImageBox.Source).Save();
         }
 
         private void ComboBoxEffects_OnLoaded(object sender, RoutedEventArgs e)
@@ -89,8 +90,39 @@ namespace ImageCompression
                 result = null;
                 return false;
             }
-            result = Effects.EffectByType[effectType](bitmap);
+            if (effectType.GetParameter() != null)
+            {
+                string errorMessage;
+                if (!ValidateParameter(effectType, EffectParameterComboBox.Text, out errorMessage))
+                {
+                    MessageBox.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    result = null;
+                    return false;
+                }
+                result = Effects.EffectByType[effectType](bitmap, EffectParameterComboBox.Text);
+            }
+            else
+                result = Effects.EffectByType[effectType](bitmap, null);
             return true;
+        }
+
+        private bool ValidateParameter(EffectType effectType, [CanBeNull] string text, out string errorMessage)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                errorMessage = "Parameter value is empty";
+                return false;
+            }
+            switch (effectType)
+            {
+                case EffectType.MedianCut:
+                    errorMessage = "Parameter must be positive degree of 2";
+                    int result;
+                    return int.TryParse(text, out result) && (result & (result - 1)) == 0;
+                default:
+                    errorMessage = string.Format("No validation for effect type: {0}", effectType);
+                    return false;
+            }
         }
 
         private void ButtonApplyLeft_Click(object sender, RoutedEventArgs e)
@@ -163,7 +195,9 @@ namespace ImageCompression
             {
                 sum += Sqr(bytesLeft[i] - bytesRight[i]);
             }
-            var PSNR = Math.Abs(sum) < 1e-5 ? double.PositiveInfinity : 10.0*Math.Log10(Sqr(255)*leftImage.PixelHeight*leftImage.PixelWidth/sum);
+            var PSNR = Math.Abs(sum) < 1e-5
+                ? double.PositiveInfinity
+                : 10.0*Math.Log10(Sqr(255)*leftImage.PixelHeight*leftImage.PixelWidth/sum);
             MessageBox.Show(string.Format("PSNR: {0:0.00####}", PSNR), "PSNR", MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
@@ -213,6 +247,19 @@ namespace ImageCompression
                 MenuRedoRight.IsEnabled = false;
             RightImageBox.Source = rightHistory.Current();
             MenuUndoRight.IsEnabled = true;
+        }
+
+        private void ComboBoxEffects_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var parameter = ((EffectType) ComboBoxEffects.SelectedIndex).GetParameter();
+            if (parameter != null)
+            {
+                EffectParameterTextBlock.Text = parameter.ParameterName;
+                if (parameter.DefaultValue != null)
+                    EffectParameterComboBox.Text = parameter.DefaultValue.ToString();
+                EffectParameterTextBlock.Visibility = Visibility.Visible;
+                EffectParameterComboBox.Visibility = Visibility.Visible;
+            }
         }
 
         private readonly PersistentStack<BitmapSource> leftHistory = new PersistentStack<BitmapSource>();

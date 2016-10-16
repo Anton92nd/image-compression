@@ -60,6 +60,8 @@
     <Compile Include="Algorithms\MedianCutting\MCNode.cs" />
     <Compile Include="Algorithms\MedianCutting\MedianCut.cs" />
     <Compile Include="Algorithms\MedianCutting\Segment.cs" />
+    <Compile Include="Attributes\ParameterAttribute.cs" />
+    <Compile Include="Attributes\TextAttribute.cs" />
     <Compile Include="Effects.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\BitmapImageExtensions.cs" />
@@ -67,7 +69,6 @@
     <Compile Include="Structures\Matrix.cs" />
     <Compile Include="Structures\PersistentStack.cs" />
     <Compile Include="Structures\Vector.cs" />
-    <Compile Include="TextAttribute.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

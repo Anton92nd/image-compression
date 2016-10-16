@@ -8,6 +8,11 @@
             L = R = null;
         }
 
+        public override string ToString()
+        {
+            return Cube.ToString();
+        }
+
         public readonly Cube Cube;
         public MCNode L, R;
     }
