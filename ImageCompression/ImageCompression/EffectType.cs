@@ -16,5 +16,8 @@
 
         [Text("Grayscale Cr")]
         Cr,
+
+        [Text("To [Y, Cb, Cr] and back")]
+        ToYCbCrAndBack,
     }
 }

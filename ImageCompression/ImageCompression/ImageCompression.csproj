@@ -60,6 +60,7 @@
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\BitmapImageExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
+    <Compile Include="Structures\Matrix.cs" />
     <Compile Include="Structures\PersistentStack.cs" />
     <Compile Include="Structures\Vector.cs" />
     <Compile Include="TextAttribute.cs" />

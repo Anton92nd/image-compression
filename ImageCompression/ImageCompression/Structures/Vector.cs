@@ -3,23 +3,28 @@ using System.Linq;
 
 namespace ImageCompression.Structures
 {
-    public struct Vector
+    public struct Vector<T>
     {
         public Vector(int size)
         {
-            bytes = new byte[size];
+            elements = new T[size];
         }
 
-        public Vector(IEnumerable<byte> bytes)
+        public Vector(IEnumerable<T> elements)
         {
-            this.bytes = bytes.ToArray();
+            this.elements = elements.ToArray();
         }
 
-        public byte this[int index]
+        public T this[int index]
         {
-            get { return bytes[index]; }
+            get { return elements[index]; }
         }
 
-        private readonly byte[] bytes;
+        public int Length
+        {
+            get { return elements.Length; }
+        }
+
+        private readonly T[] elements;
     }
 }

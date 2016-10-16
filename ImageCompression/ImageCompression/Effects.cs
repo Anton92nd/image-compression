@@ -15,7 +15,7 @@ namespace ImageCompression
             return bitmap.Create(bitmap
                 .GetColors()
                 .Select(v => (byte)((v[0]*77 + v[1]*150 + v[2]*29) >> 8))
-                .Select(c => new Vector(new []{c, c, c}))
+                .Select(c => new Vector<byte>(new []{c, c, c}))
                 .ToArray());
         }
 
@@ -24,40 +24,61 @@ namespace ImageCompression
             return bitmap.Create(bitmap
                 .GetColors()
                 .Select(v => (byte)((v[0]+v[1]+v[2])/3))
-                .Select(c => new Vector(new[] { c, c, c }))
+                .Select(c => new Vector<byte>(new[] { c, c, c }))
                 .ToArray());
         }
 
         public static BitmapSource ApplyMonochromeCr(BitmapSource bitmap)
         {
-            return bitmap.Create(TransformYCbCr(bitmap.GetColors())
-                .Select(v => new Vector(new[] { v[2], v[2], v[2] }))
+            return bitmap.Create(TransformRGBToYCbCr(bitmap.GetColors())
+                .Select(v => new Vector<byte>(new[] { v[2], v[2], v[2] }))
                 .ToArray());
         }
 
         public static BitmapSource ApplyMonochromeCb(BitmapSource bitmap)
         {
-            return bitmap.Create(TransformYCbCr(bitmap.GetColors())
-                .Select(v => new Vector(new[] { v[1], v[1], v[1] }))
+            return bitmap.Create(TransformRGBToYCbCr(bitmap.GetColors())
+                .Select(v => new Vector<byte>(new[] { v[1], v[1], v[1] }))
                 .ToArray());
         }
 
         public static BitmapSource ApplyMonochromeY(BitmapSource bitmap)
         {
-            return bitmap.Create(TransformYCbCr(bitmap.GetColors())
-                .Select(v => new Vector(new[] {v[0], v[0], v[0]}))
+            return bitmap.Create(TransformRGBToYCbCr(bitmap.GetColors())
+                .Select(v => new Vector<byte>(new[] {v[0], v[0], v[0]}))
                 .ToArray());
         }
 
-        private static Vector[] TransformYCbCr(Vector[] colors)
+        public static BitmapSource ApplyToYCbCrAndBack(BitmapSource bitmap)
         {
-            var result = new Vector[colors.Length];
+            var sourceColors = bitmap.GetColors();
+            var transformed = TransformRGBToYCbCr(sourceColors);
+            var back = TransformYCbCrToRGB(transformed);
+            return bitmap.Create(back);
+        }
+
+        private static Vector<byte>[] TransformRGBToYCbCr(Vector<byte>[] colors)
+        {
+            var result = new Vector<byte>[colors.Length];
             for (var i = 0; i < colors.Length; i++)
             {
                 var y = (byte) ((77*colors[i][0] + 150*colors[i][1] + 29*colors[i][2]) >> 8);
                 var cb = (byte) (((-43*colors[i][0] - 85*colors[i][1] + 128*colors[i][2]) >> 8) + (1 << 7));
                 var cr = (byte) ((((1 << 7)*colors[i][0] - 107*colors[i][1] - 21*colors[i][2]) >> 8) + (1 << 7));
-                result[i] = new Vector(new[] {y, cb, cr});
+                result[i] = new Vector<byte>(new[] {y, cb, cr});
+            }
+            return result;
+        }
+
+        private static Vector<byte>[] TransformYCbCrToRGB(Vector<byte>[] colors)
+        {
+            var result = new Vector<byte>[colors.Length];
+            for (var i = 0; i < colors.Length; i++)
+            {
+                var r = (byte) Math.Max(0, colors[i][0] + ((colors[i][2] - 128) << 8) / 183);
+                var g = (byte) Math.Max(0, colors[i][0] - (5329 * (colors[i][1] - 128) + 11103 * (colors[i][2] - 128)) / 15481);
+                var b = (byte) Math.Max(0, colors[i][0] + ((colors[i][1] - 128) * 256) / 144);
+                result[i] = new Vector<byte>(new[] { r, g, b });
             }
             return result;
         }
@@ -70,6 +91,7 @@ namespace ImageCompression
             {EffectType.Y, ApplyMonochromeY},
             {EffectType.Cb, ApplyMonochromeCb},
             {EffectType.Cr, ApplyMonochromeCr},
+            {EffectType.ToYCbCrAndBack, ApplyToYCbCrAndBack},
         };
 
         public static bool CanApply(BitmapSource bitmap, EffectType effectType)
@@ -87,6 +109,7 @@ namespace ImageCompression
             {EffectType.Y, new[] {PixelFormats.Bgr32}},
             {EffectType.Cb, new[] {PixelFormats.Bgr32}},
             {EffectType.Cr, new[] {PixelFormats.Bgr32}},
+            {EffectType.ToYCbCrAndBack, new []{PixelFormats.Bgr32}},
         };
     }
 }
