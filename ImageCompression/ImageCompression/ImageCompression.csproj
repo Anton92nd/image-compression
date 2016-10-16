@@ -56,6 +56,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Algorithms\MedianCutting\Cube.cs" />
+    <Compile Include="Algorithms\MedianCutting\MedianCut.cs" />
+    <Compile Include="Algorithms\MedianCutting\Segment.cs" />
     <Compile Include="Effects.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\BitmapImageExtensions.cs" />

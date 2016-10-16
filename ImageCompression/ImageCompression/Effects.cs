@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ImageCompression.Algorithms.MedianCutting;
 using ImageCompression.Extensions;
 using ImageCompression.Structures;
 
@@ -57,6 +58,12 @@ namespace ImageCompression
             return bitmap.Create(back);
         }
 
+        public static BitmapSource ApplyMedianCut1024(BitmapSource bitmap)
+        {
+            Vector<byte>[] pallet;
+            return bitmap.Create(MedianCut.Build(1024, bitmap.GetColors(), out pallet));
+        }
+
         private static Vector<byte>[] TransformRGBToYCbCr(Vector<byte>[] colors)
         {
             var result = new Vector<byte>[colors.Length];
@@ -92,6 +99,7 @@ namespace ImageCompression
             {EffectType.Cb, ApplyMonochromeCb},
             {EffectType.Cr, ApplyMonochromeCr},
             {EffectType.ToYCbCrAndBack, ApplyToYCbCrAndBack},
+            {EffectType.MedianCut, ApplyMedianCut1024},
         };
 
         public static bool CanApply(BitmapSource bitmap, EffectType effectType)
@@ -110,6 +118,7 @@ namespace ImageCompression
             {EffectType.Cb, new[] {PixelFormats.Bgr32}},
             {EffectType.Cr, new[] {PixelFormats.Bgr32}},
             {EffectType.ToYCbCrAndBack, new []{PixelFormats.Bgr32}},
+            {EffectType.MedianCut, new []{PixelFormats.Bgr32}},
         };
     }
 }

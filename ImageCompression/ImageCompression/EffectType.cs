@@ -19,5 +19,8 @@
 
         [Text("To [Y, Cb, Cr] and back")]
         ToYCbCrAndBack,
+
+        [Text("Median cut (1024)")]
+        MedianCut,
     }
 }
