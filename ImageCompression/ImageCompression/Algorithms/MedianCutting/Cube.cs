@@ -1,4 +1,5 @@
-﻿using ImageCompression.Structures;
+﻿using System.Diagnostics.Contracts;
+using ImageCompression.Structures;
 
 namespace ImageCompression.Algorithms.MedianCutting
 {
@@ -11,6 +12,7 @@ namespace ImageCompression.Algorithms.MedianCutting
             Oz = oz;
         }
 
+        [Pure]
         public bool Contains(Vector<byte> color)
         {
             return Ox.Start <= color[0] && color[0] <= Ox.End &&

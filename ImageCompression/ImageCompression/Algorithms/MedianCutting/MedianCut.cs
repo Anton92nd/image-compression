@@ -13,32 +13,35 @@ namespace ImageCompression.Algorithms.MedianCutting
                 throw new Exception("Pallet size must be power of 2");
             Cube initialCube;
             var stats = GetStatistics(colors, out initialCube);
-            var cubes = new Cube[] {initialCube};
-            while (cubes.Length < palletSize)
+            var root = new MCNode(initialCube);
+            var leaves = new MCNode[]{root};
+            while (leaves.Length < palletSize)
             {
-                var newCubes = new List<Cube>();
-                foreach (var cube in cubes)
+                var newLeaves = new List<MCNode>();
+                foreach (var node in leaves)
                 {
                     Cube cube1, cube2;
-                    SplitCube(stats, cube, out cube1, out cube2);
-                    if (newCubes.Contains(cube1))
-                        throw new Exception();
-                    newCubes.Add(cube1);
-                    if (newCubes.Contains(cube2))
-                        throw new Exception();
-                    newCubes.Add(cube2);
+                    SplitCube(stats, node.Cube, out cube1, out cube2);
+                    var l = new MCNode(cube1);
+                    var r = new MCNode(cube2);
+                    node.L = l;
+                    node.R = r;
+                    newLeaves.Add(l);
+                    newLeaves.Add(r);
                 }
-                cubes = newCubes.ToArray();
+                leaves = newLeaves.ToArray();
             }
-            var palletDict = new Dictionary<Cube, Vector<byte>>();
-            foreach (var cube in cubes)
-            {
-                if (palletDict.ContainsKey(cube))
-                    throw new Exception();
-                palletDict[cube] = GetCubeMedian(stats, cube);
-            }
-            pallet = palletDict.Values.ToArray();
-            return colors.Select(color => palletDict[palletDict.Keys.First(cube => cube.Contains(color))]).ToArray();
+            pallet = leaves.Select(l => GetCubeMedian(stats, l.Cube)).ToArray();
+            return colors.Select(color => FindColor(stats, root, color)).ToArray();
+        }
+
+        private static Vector<byte> FindColor(int[][] stats, MCNode mcNode, Vector<byte> color)
+        {
+            if (mcNode.L == null)
+                return GetCubeMedian(stats, mcNode.Cube);
+            if (mcNode.L.Cube.Contains(color))
+                return FindColor(stats, mcNode.L, color);
+            return FindColor(stats, mcNode.R, color);
         }
 
         private static Vector<byte> GetCubeMedian(int[][] stats, Cube cube)

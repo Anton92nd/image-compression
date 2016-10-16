@@ -57,6 +57,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Algorithms\MedianCutting\Cube.cs" />
+    <Compile Include="Algorithms\MedianCutting\MCNode.cs" />
     <Compile Include="Algorithms\MedianCutting\MedianCut.cs" />
     <Compile Include="Algorithms\MedianCutting\Segment.cs" />
     <Compile Include="Effects.cs" />
