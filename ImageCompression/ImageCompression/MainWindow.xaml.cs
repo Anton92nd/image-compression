@@ -181,8 +181,8 @@ namespace ImageCompression
             var rightImage = RightImageBox.Source as BitmapSource;
             if (leftImage == null || rightImage == null)
                 return;
-            var bytesLeft = leftImage.GetBytes();
-            var bytesRight = rightImage.GetBytes();
+            var bytesLeft = leftImage.GetGoodBytes();
+            var bytesRight = rightImage.GetGoodBytes();
             if (bytesLeft.Length != bytesRight.Length || leftImage.PixelWidth != rightImage.PixelWidth
                 || leftImage.PixelHeight != rightImage.PixelHeight)
             {
@@ -190,19 +190,19 @@ namespace ImageCompression
                     MessageBoxImage.Error);
                 return;
             }
-            var sum = 0.0;
+            var sum = 0L;
             for (var i = 0; i < bytesLeft.Length; ++i)
             {
                 sum += Sqr(bytesLeft[i] - bytesRight[i]);
             }
-            var PSNR = Math.Abs(sum) < 1e-5
+            var psnr = sum == 0
                 ? double.PositiveInfinity
-                : 10.0*Math.Log10(Sqr(255)*leftImage.PixelHeight*leftImage.PixelWidth/sum);
-            MessageBox.Show(string.Format("PSNR: {0:0.00####}", PSNR), "PSNR", MessageBoxButton.OK,
+                : 10.0*Math.Log10(Sqr(255)*bytesLeft.Length * 1.0/sum);
+            MessageBox.Show(string.Format("PSNR: {0:0.00####}", psnr), "PSNR", MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
 
-        private double Sqr(double x)
+        private long Sqr(long x)
         {
             return x*x;
         }

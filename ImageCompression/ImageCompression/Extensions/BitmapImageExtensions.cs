@@ -19,6 +19,17 @@ namespace ImageCompression.Extensions
         }
 
         [NotNull]
+        public static byte[] GetGoodBytes([NotNull] this BitmapSource bitmap)
+        {
+            var stride = bitmap.PixelWidth * (bitmap.Format.BitsPerPixel / 8);
+            var result = new byte[bitmap.PixelHeight * stride];
+            bitmap.CopyPixels(result, stride, 0);
+            if (bitmap.Format != PixelFormats.Bgr32)
+                return result;
+            return result.Where((v, i) => i%4 != 3).ToArray();
+        }
+
+        [NotNull]
         public static Vector<Byte>[] GetColors([NotNull] this BitmapSource bitmap)
         {
             if (bitmap.Format != PixelFormats.Bgr32)
