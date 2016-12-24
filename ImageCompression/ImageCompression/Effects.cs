@@ -60,10 +60,43 @@ namespace ImageCompression
 
         public static BitmapSource ApplyMedianCut(BitmapSource bitmap, object parameter)
         {
-            var paletteSize = int.Parse((string)parameter);
+            var paletteSize = (int)parameter;
             Vector<byte>[] palette;
             return bitmap.Create(MedianCut.Build(paletteSize, bitmap.GetColors(), out palette));
         }
+
+        public static BitmapSource QuantizeInRgb(BitmapSource bitmap, object parameter)
+        {
+            var quantizationVector = parameter as Vector<byte>;
+            var colors = bitmap.GetColors().Select(c => QuantizeVector(c, quantizationVector)).ToArray();
+            return bitmap.Create(colors);
+        }
+
+        public static BitmapSource QuantizeInYCbCr(BitmapSource bitmap, object parameter)
+        {
+            var quantizationVector = parameter as Vector<byte>;
+            var colors = TransformYCbCrToRGB(
+                TransformRGBToYCbCr(bitmap.GetColors())
+                .Select(c => QuantizeVector(c, quantizationVector)).ToArray()
+                );
+            return bitmap.Create(colors);
+        }
+
+        private static Vector<byte> QuantizeVector(Vector<byte> color, Vector<byte> quantizationVector)
+        {
+            var bytes = new byte[3];
+            for (var i = 0; i < 3; i++)
+            {
+                bytes[i] = QuantizeByte(color[i], quantizationVector[i]);
+            }
+            return new Vector<byte>(bytes);
+        }
+
+        private static byte QuantizeByte(byte value, byte bits)
+        {
+            return (byte) (((value >> (8 - bits)) << (8 - bits)) + (bits == 8 ? 0 : 1 << (8 - bits - 1)));
+        }
+
 
         private static Vector<byte>[] TransformRGBToYCbCr(Vector<byte>[] colors)
         {
@@ -91,6 +124,7 @@ namespace ImageCompression
             return result;
         }
 
+
         public static readonly Dictionary<EffectType, Func<BitmapSource, object, BitmapSource>> EffectByType = new Dictionary
             <EffectType, Func<BitmapSource, object, BitmapSource>>
         {
@@ -101,6 +135,8 @@ namespace ImageCompression
             {EffectType.Cr, (b, p) => ApplyMonochromeCr(b)},
             {EffectType.ToYCbCrAndBack, (b, p) => ApplyToYCbCrAndBack(b)},
             {EffectType.MedianCut, (b, p) => ApplyMedianCut(b, p)},
+            {EffectType.QuantizationRgb, (b, p) => QuantizeInRgb(b, p)},
+            {EffectType.QuantizationYCrCb, (b, p) => QuantizeInYCbCr(b, p)},
         };
 
         public static bool CanApply(BitmapSource bitmap, EffectType effectType)
@@ -120,6 +156,8 @@ namespace ImageCompression
             {EffectType.Cr, new[] {PixelFormats.Bgr32}},
             {EffectType.ToYCbCrAndBack, new []{PixelFormats.Bgr32}},
             {EffectType.MedianCut, new []{PixelFormats.Bgr32}},
+            {EffectType.QuantizationRgb, new []{PixelFormats.Bgr32}},
+            {EffectType.QuantizationYCrCb, new []{PixelFormats.Bgr32}},
         };
     }
 }

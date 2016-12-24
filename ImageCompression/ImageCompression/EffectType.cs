@@ -4,10 +4,10 @@ namespace ImageCompression
 {
     public enum EffectType
     {
-        [Text("Grayscale (bad)")]
+        [Text("Grayscale (Mean)")]
         GrayscaleBad,
 
-        [Text("Grayscale (good)")]
+        [Text("Grayscale (CCIR 601-1)")]
         GrayscaleGood,
 
         [Text("Grayscale Y")]
@@ -25,5 +25,13 @@ namespace ImageCompression
         [Text("Median cut")]
         [Parameter("Palette size:", 1024)]
         MedianCut,
+
+        [Text("Quantization [R, G, B]")]
+        [Parameter("Quantization bits: ", "3x4x3")]
+        QuantizationRgb,
+
+        [Text("Quantization [Y, Cb, Cr]")]
+        [Parameter("Quantization bits: ", "2x4x4")]
+        QuantizationYCrCb,
     }
 }

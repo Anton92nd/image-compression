@@ -31,7 +31,7 @@
         <Button Name="ButtonPSNR" IsEnabled="False" Content="PSNR" HorizontalAlignment="Left" Margin="512,239,0,0" VerticalAlignment="Top" Width="80" Click="ButtonPSNR_OnClick"/>
         <ComboBox Name="ComboBoxEffects" IsEditable="False" Loaded="ComboBoxEffects_OnLoaded" HorizontalAlignment="Left" Margin="46,595,0,0" VerticalAlignment="Top" Width="189" SelectionChanged="ComboBoxEffects_OnSelectionChanged"/>
         <TextBlock HorizontalAlignment="Left" Height="23" Margin="46,565,0,0" TextWrapping="Wrap" Text="Choose effect:" VerticalAlignment="Top" Width="79"/>
-        <ComboBox Name="EffectParameterComboBox" Visibility="Hidden" IsEditable="True" HorizontalAlignment="Left" Height="23" Margin="115,620,0,0" VerticalAlignment="Top" Width="120"/>
-        <TextBlock Name="EffectParameterTextBlock" Visibility="Hidden" HorizontalAlignment="Left" Margin="46,620,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="23" Width="64"/>
+        <ComboBox Name="EffectParameterComboBox" Visibility="Hidden" IsEditable="True" HorizontalAlignment="Left" Height="23" Margin="223,620,0,0" VerticalAlignment="Top" Width="120"/>
+        <TextBlock Name="EffectParameterTextBlock" Visibility="Hidden" HorizontalAlignment="Left" Margin="46,620,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="23" Width="150"/>
     </Grid>
 </Window>

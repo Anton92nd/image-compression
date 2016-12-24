@@ -93,21 +93,23 @@ namespace ImageCompression
             if (effectType.GetParameter() != null)
             {
                 string errorMessage;
-                if (!ValidateParameter(effectType, EffectParameterComboBox.Text, out errorMessage))
+                object parameterValue;
+                if (!ValidateParameter(effectType, EffectParameterComboBox.Text, out errorMessage, out parameterValue))
                 {
                     MessageBox.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     result = null;
                     return false;
                 }
-                result = Effects.EffectByType[effectType](bitmap, EffectParameterComboBox.Text);
+                result = Effects.EffectByType[effectType](bitmap, parameterValue);
             }
             else
                 result = Effects.EffectByType[effectType](bitmap, null);
             return true;
         }
 
-        private bool ValidateParameter(EffectType effectType, [CanBeNull] string text, out string errorMessage)
+        private bool ValidateParameter(EffectType effectType, [CanBeNull] string text, out string errorMessage, out object result)
         {
+            result = null;
             if (string.IsNullOrEmpty(text))
             {
                 errorMessage = "Parameter value is empty";
@@ -117,12 +119,33 @@ namespace ImageCompression
             {
                 case EffectType.MedianCut:
                     errorMessage = "Parameter must be positive degree of 2";
-                    int result;
-                    return int.TryParse(text, out result) && (result & (result - 1)) == 0;
+                    int res;
+                    if (int.TryParse(text, out res) && (res & (res - 1)) == 0)
+                    {
+                        result = res;
+                        return true;
+                    }
+                    return false;
+                case EffectType.QuantizationRgb:
+                case EffectType.QuantizationYCrCb:
+                    errorMessage = "Parameter must be in format 'BxBxB' where 1 <= B <= 8";
+                    var bits = text.Split(new[] {'x'}, StringSplitOptions.RemoveEmptyEntries);
+                    if (bits.Length != 3 || bits.Any(IsInvalid))
+                        return false;
+                    result = new Vector<byte>(bits.Select(byte.Parse));
+                    return true;
                 default:
                     errorMessage = string.Format("No validation for effect type: {0}", effectType);
                     return false;
             }
+        }
+
+        private bool IsInvalid(string token)
+        {
+            int r;
+            if (!int.TryParse(token, out r))
+                return false;
+            return r < 1 || r > 8;
         }
 
         private void ButtonApplyLeft_Click(object sender, RoutedEventArgs e)
