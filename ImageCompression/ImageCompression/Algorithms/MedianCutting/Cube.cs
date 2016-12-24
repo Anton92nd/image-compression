@@ -65,7 +65,7 @@ namespace ImageCompression.Algorithms.MedianCutting
             var v = new byte[]{0, 0, 0};
             for (var i = 0; i < 3; i++)
             {
-                v[i] = (byte) BinarySearch(stats[i], min[i], max[i]);
+                v[i] = BinarySearch(stats[i], min[i], max[i]);
             }
             return new Vector<byte>(v);
         }
@@ -89,7 +89,7 @@ namespace ImageCompression.Algorithms.MedianCutting
             cube2 = new Cube(list2);
         }
 
-        private static int BinarySearch([NotNull] int[] array, int l, int r)
+        private static byte BinarySearch([NotNull] int[] array, int l, int r)
         {
             var toFind = (array[l] + array[r])/2;
             while (l + 1 < r)
@@ -100,7 +100,7 @@ namespace ImageCompression.Algorithms.MedianCutting
                 else
                     r = m;
             }
-            return l;
+            return (byte)l;
         }
     }
 }
