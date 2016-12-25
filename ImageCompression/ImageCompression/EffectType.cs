@@ -37,5 +37,8 @@ namespace ImageCompression
         [Text("Linde-Buzo-Gray algorithm")]
         [Parameter("Palette size:", 256)]
         LindeBuzoGray,
+
+        [Text("Discrete cosine transform")]
+        Dct,
     }
 }

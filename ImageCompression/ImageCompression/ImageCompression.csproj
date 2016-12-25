@@ -56,6 +56,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Algorithms\DiscreteCosineTransform\DctParameters.cs" />
+    <Compile Include="Algorithms\DiscreteCosineTransform\DecimationType.cs" />
+    <Compile Include="Algorithms\DiscreteCosineTransform\MatrixGenerators.cs" />
+    <Compile Include="Algorithms\DiscreteCosineTransform\QuantizationType.cs" />
     <Compile Include="Algorithms\LBG\DSU.cs" />
     <Compile Include="Algorithms\LBG\Edge.cs" />
     <Compile Include="Algorithms\LBG\LbgAlgorithm.cs" />

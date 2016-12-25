@@ -74,6 +74,11 @@ namespace ImageCompression
             return bitmap.Create(LbgAlgorithm.Build(paletteSize, bitmap.GetColors(), out palette));
         }
 
+        public static BitmapSource ApplyDiscreteCosineTransform(BitmapSource bitmap, object parameter)
+        {
+            throw new NotImplementedException();
+        }
+
         public static BitmapSource QuantizeInRgb(BitmapSource bitmap, object parameter)
         {
             var quantizationVector = parameter as Vector<byte>;
@@ -131,6 +136,7 @@ namespace ImageCompression
             {EffectType.LindeBuzoGray, (b, p) => ApplyLindeBuzoGray(b, p)},
             {EffectType.QuantizationRgb, (b, p) => QuantizeInRgb(b, p)},
             {EffectType.QuantizationYCrCb, (b, p) => QuantizeInYCbCr(b, p)},
+            {EffectType.Dct, (b, p) => ApplyDiscreteCosineTransform(b, p)},
         };
 
         public static bool CanApply(BitmapSource bitmap, EffectType effectType)
@@ -153,6 +159,7 @@ namespace ImageCompression
             {EffectType.LindeBuzoGray, new []{PixelFormats.Bgr32}},
             {EffectType.QuantizationRgb, new []{PixelFormats.Bgr32}},
             {EffectType.QuantizationYCrCb, new []{PixelFormats.Bgr32}},
+            {EffectType.Dct, new []{PixelFormats.Bgr32}},
         };
     }
 }
