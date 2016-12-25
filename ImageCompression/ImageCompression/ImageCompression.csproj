@@ -56,8 +56,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Algorithms\LBG\DSU.cs" />
+    <Compile Include="Algorithms\LBG\Edge.cs" />
+    <Compile Include="Algorithms\LBG\LbgAlgorithm.cs" />
     <Compile Include="Algorithms\MedianCutting\Cube.cs" />
     <Compile Include="Algorithms\MedianCutting\MedianCut.cs" />
+    <Compile Include="Algorithms\Quantization.cs" />
     <Compile Include="Attributes\ParameterAttribute.cs" />
     <Compile Include="Attributes\TextAttribute.cs" />
     <Compile Include="Effects.cs" />

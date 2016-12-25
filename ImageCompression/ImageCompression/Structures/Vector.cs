@@ -42,7 +42,15 @@ namespace ImageCompression.Structures
 
         public override int GetHashCode()
         {
-            return elements.GetHashCode();
+            var sum = 0;
+            foreach (T element in elements)
+            {
+                unchecked
+                {
+                    sum = sum * 397 + element.GetHashCode();
+                }
+            }
+            return sum;
         }
 
         public override string ToString()

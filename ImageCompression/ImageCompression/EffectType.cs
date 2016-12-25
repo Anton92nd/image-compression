@@ -27,11 +27,15 @@ namespace ImageCompression
         MedianCut,
 
         [Text("Quantization [R, G, B]")]
-        [Parameter("Quantization bits: ", "3x4x3")]
+        [Parameter("Quantization bits:", "3x4x3")]
         QuantizationRgb,
 
         [Text("Quantization [Y, Cb, Cr]")]
-        [Parameter("Quantization bits: ", "2x4x4")]
+        [Parameter("Quantization bits:", "2x4x4")]
         QuantizationYCrCb,
+
+        [Text("Linde-Buzo-Gray algorithm")]
+        [Parameter("Palette size:", 256)]
+        LindeBuzoGray,
     }
 }

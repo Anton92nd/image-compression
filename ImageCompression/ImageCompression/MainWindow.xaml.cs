@@ -118,6 +118,7 @@ namespace ImageCompression
             switch (effectType)
             {
                 case EffectType.MedianCut:
+                case EffectType.LindeBuzoGray:
                     errorMessage = "Parameter must be positive degree of 2";
                     int res;
                     if (int.TryParse(text, out res) && (res & (res - 1)) == 0)
