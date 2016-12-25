@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using ImageCompression.Algorithms.DiscreteCosineTransform;
 using ImageCompression.Extensions;
 using ImageCompression.Structures;
 using JetBrains.Annotations;
@@ -75,12 +76,6 @@ namespace ImageCompression
             ((BitmapSource) RightImageBox.Source).Save();
         }
 
-        private void ComboBoxEffects_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            ComboBoxEffects.ItemsSource = typeof(EffectType).GetEnumValues<EffectType>().Select(el => el.GetText());
-            ComboBoxEffects.SelectedIndex = 0;
-        }
-
         private bool ApplyEffect(BitmapSource bitmap, EffectType effectType, out BitmapSource result)
         {
             if (!Effects.CanApply(bitmap, effectType))
@@ -102,9 +97,29 @@ namespace ImageCompression
                 }
                 result = Effects.EffectByType[effectType](bitmap, parameterValue);
             }
+            else if (effectType == EffectType.Dct)
+            {
+                string errorMessage;
+                DctParameters dctParameters;
+                if (!ValidateDct(effectType, EffectParameterComboBox.Text, out errorMessage, out dctParameters))
+                {
+                    
+                    MessageBox.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    result = null;
+                    return false;
+                }
+                result = Effects.EffectByType[effectType](bitmap, dctParameters);
+            }
             else
+            {
                 result = Effects.EffectByType[effectType](bitmap, null);
+            }
             return true;
+        }
+
+        private bool ValidateDct(EffectType effectType, string text, out string errorMessage, out DctParameters dctParameters)
+        {
+            throw new NotImplementedException();
         }
 
         private bool ValidateParameter(EffectType effectType, [CanBeNull] string text, out string errorMessage, out object result)
@@ -275,7 +290,8 @@ namespace ImageCompression
 
         private void ComboBoxEffects_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var parameter = ((EffectType) ComboBoxEffects.SelectedIndex).GetParameter();
+            var effectType = (EffectType) ComboBoxEffects.SelectedIndex;
+            var parameter = effectType.GetParameter();
             if (parameter != null)
             {
                 EffectParameterTextBlock.Text = parameter.ParameterName;
@@ -283,6 +299,77 @@ namespace ImageCompression
                     EffectParameterComboBox.Text = parameter.DefaultValue.ToString();
                 EffectParameterTextBlock.Visibility = Visibility.Visible;
                 EffectParameterComboBox.Visibility = Visibility.Visible;
+            }
+            DctGrid.Visibility = effectType == EffectType.Dct ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        private void ComboBoxEffects_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            ComboBoxEffects.ItemsSource = typeof(EffectType).GetEnumValues<EffectType>().Select(el => el.GetText());
+            ComboBoxEffects.SelectedIndex = 0;
+        }
+
+        private void ComboBox_Decimation_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            ComboBox_Decimation.ItemsSource = typeof(DecimationType).GetEnumValues<DecimationType>().Select(el => el.GetText());
+            ComboBox_Decimation.SelectedIndex = 0;
+        }
+
+        private void ComboBox_Quantization_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            ComboBox_Quantization.ItemsSource = typeof(QuantizationType).GetEnumValues<QuantizationType>().Select(el => el.GetText());
+            ComboBox_Quantization.SelectedIndex = 0;
+        }
+
+        private void ComboBox_Quantization_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var quantizationType = (QuantizationType) ComboBox_Quantization.SelectedIndex;
+            switch (quantizationType)
+            {
+                case QuantizationType.LargestN:
+                    JPG_FirstText.Text = "N_Y:";
+                    JPG_FirstParameter.Text = "10";
+                    JPG_SecondText.Text = "N_C:";
+                    JPG_SecondParameter.Text = "10";
+                    JPG_FirstText.Visibility = Visibility.Visible;
+                    JPG_FirstParameter.Visibility = Visibility.Visible;
+                    JPG_SecondText.Visibility = Visibility.Hidden;
+                    JPG_SecondParameter.Visibility = Visibility.Hidden;
+                    JPG_ThirdText.Visibility = Visibility.Hidden;
+                    JPG_ThirdParameter.Visibility = Visibility.Hidden;
+                    JPG_FourthText.Visibility = Visibility.Hidden;
+                    JPG_FourthParameter.Visibility = Visibility.Hidden;
+                    break;
+                case QuantizationType.QuantizationMatrix:
+                    JPG_FirstText.Text = "\u03B1_Y:";
+                    JPG_FirstParameter.Text = "1";
+                    JPG_SecondText.Text = "\u0263_Y:";
+                    JPG_SecondParameter.Text = "2";
+                    JPG_ThirdText.Text = "\u03B1_C:";
+                    JPG_ThirdParameter.Text = "1";
+                    JPG_FourthText.Text = "\u0263_C:";
+                    JPG_FourthParameter.Text = "4";
+                    JPG_FirstText.Visibility = Visibility.Visible;
+                    JPG_FirstParameter.Visibility = Visibility.Visible;
+                    JPG_SecondText.Visibility = Visibility.Visible;
+                    JPG_SecondParameter.Visibility = Visibility.Visible;
+                    JPG_ThirdText.Visibility = Visibility.Visible;
+                    JPG_ThirdParameter.Visibility = Visibility.Visible;
+                    JPG_FourthText.Visibility = Visibility.Visible;
+                    JPG_FourthParameter.Visibility = Visibility.Visible;
+                    break;
+                case QuantizationType.DefaultJpegMatrix:
+                    JPG_FirstText.Visibility = Visibility.Hidden;
+                    JPG_FirstParameter.Visibility = Visibility.Hidden;
+                    JPG_SecondText.Visibility = Visibility.Hidden;
+                    JPG_SecondParameter.Visibility = Visibility.Hidden;
+                    JPG_ThirdText.Visibility = Visibility.Hidden;
+                    JPG_ThirdParameter.Visibility = Visibility.Hidden;
+                    JPG_FourthText.Visibility = Visibility.Hidden;
+                    JPG_FourthParameter.Visibility = Visibility.Hidden;
+                    break;
+                default:
+                    throw new Exception("Invalid program state");
             }
         }
 
