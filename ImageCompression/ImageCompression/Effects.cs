@@ -101,9 +101,9 @@ namespace ImageCompression
             var result = new Vector<byte>[colors.Length];
             for (var i = 0; i < colors.Length; i++)
             {
-                var y = (byte) ((77*colors[i][0] + 150*colors[i][1] + 29*colors[i][2]) >> 8);
-                var cb = (byte) (((-43*colors[i][0] - 85*colors[i][1] + 128*colors[i][2]) >> 8) + (1 << 7));
-                var cr = (byte) ((((1 << 7)*colors[i][0] - 107*colors[i][1] - 21*colors[i][2]) >> 8) + (1 << 7));
+                var y = (byte) Math.Min(255, Math.Max(0, (77*colors[i][0] + 150*colors[i][1] + 29*colors[i][2]) >> 8));
+                var cb = (byte) Math.Min(255, Math.Max(0, ((-43*colors[i][0] - 85*colors[i][1] + 128*colors[i][2]) >> 8) + (1 << 7)));
+                var cr = (byte) Math.Min(255, Math.Max(0, (((1 << 7)*colors[i][0] - 107*colors[i][1] - 21*colors[i][2]) >> 8) + (1 << 7)));
                 result[i] = new Vector<byte>(new[] {y, cb, cr});
             }
             return result;
@@ -114,9 +114,9 @@ namespace ImageCompression
             var result = new Vector<byte>[colors.Length];
             for (var i = 0; i < colors.Length; i++)
             {
-                var r = (byte) Math.Max(0, colors[i][0] + ((colors[i][2] - 128) << 8) / 183);
-                var g = (byte) Math.Max(0, colors[i][0] - (5329 * (colors[i][1] - 128) + 11103 * (colors[i][2] - 128)) / 15481);
-                var b = (byte) Math.Max(0, colors[i][0] + ((colors[i][1] - 128) << 8) / 144);
+                var r = (byte) Math.Min(255, Math.Max(0, colors[i][0] + ((colors[i][2] - 128) << 8) / 183));
+                var g = (byte) Math.Min(255, Math.Max(0, colors[i][0] - (5329 * (colors[i][1] - 128) + 11103 * (colors[i][2] - 128)) / 15481));
+                var b = (byte) Math.Min(255, Math.Max(0, colors[i][0] + ((colors[i][1] - 128) << 8) / 144));
                 result[i] = new Vector<byte>(new[] { r, g, b });
             }
             return result;
