@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ImageCompression.Algorithms;
+using ImageCompression.Algorithms.DiscreteCosineTransform;
 using ImageCompression.Algorithms.LBG;
 using ImageCompression.Algorithms.MedianCutting;
 using ImageCompression.Extensions;
@@ -33,21 +34,21 @@ namespace ImageCompression
 
         public static BitmapSource ApplyMonochromeCr(BitmapSource bitmap)
         {
-            return bitmap.Create(TransformRGBToYCbCr(bitmap.GetColors())
+            return bitmap.Create(Transformation.RGBToYCbCr(bitmap.GetColors())
                 .Select(v => new Vector<byte>(new[] { v[2], v[2], v[2] }))
                 .ToArray());
         }
 
         public static BitmapSource ApplyMonochromeCb(BitmapSource bitmap)
         {
-            return bitmap.Create(TransformRGBToYCbCr(bitmap.GetColors())
+            return bitmap.Create(Transformation.RGBToYCbCr(bitmap.GetColors())
                 .Select(v => new Vector<byte>(new[] { v[1], v[1], v[1] }))
                 .ToArray());
         }
 
         public static BitmapSource ApplyMonochromeY(BitmapSource bitmap)
         {
-            return bitmap.Create(TransformRGBToYCbCr(bitmap.GetColors())
+            return bitmap.Create(Transformation.RGBToYCbCr(bitmap.GetColors())
                 .Select(v => new Vector<byte>(new[] {v[0], v[0], v[0]}))
                 .ToArray());
         }
@@ -55,8 +56,8 @@ namespace ImageCompression
         public static BitmapSource ApplyToYCbCrAndBack(BitmapSource bitmap)
         {
             var sourceColors = bitmap.GetColors();
-            var transformed = TransformRGBToYCbCr(sourceColors);
-            var back = TransformYCbCrToRGB(transformed);
+            var transformed = Transformation.RGBToYCbCr(sourceColors);
+            var back = Transformation.YCbCrToRGB(transformed);
             return bitmap.Create(back);
         }
 
@@ -76,7 +77,8 @@ namespace ImageCompression
 
         public static BitmapSource ApplyDiscreteCosineTransform(BitmapSource bitmap, object parameter)
         {
-            throw new NotImplementedException();
+            var dctParameters = (DctParameters) parameter;
+            return bitmap.Create(DctAlgorithm.Build(bitmap, dctParameters));
         }
 
         public static BitmapSource QuantizeInRgb(BitmapSource bitmap, object parameter)
@@ -89,39 +91,12 @@ namespace ImageCompression
         public static BitmapSource QuantizeInYCbCr(BitmapSource bitmap, object parameter)
         {
             var quantizationVector = parameter as Vector<byte>;
-            var colors = TransformYCbCrToRGB(
-                TransformRGBToYCbCr(bitmap.GetColors())
+            var colors = Transformation.YCbCrToRGB(
+                Transformation.RGBToYCbCr(bitmap.GetColors())
                 .Select(c => Quantization.QuantizeVector(c, quantizationVector)).ToArray()
                 );
             return bitmap.Create(colors);
         }
-
-        private static Vector<byte>[] TransformRGBToYCbCr(Vector<byte>[] colors)
-        {
-            var result = new Vector<byte>[colors.Length];
-            for (var i = 0; i < colors.Length; i++)
-            {
-                var y = (byte) Math.Min(255, Math.Max(0, (77*colors[i][0] + 150*colors[i][1] + 29*colors[i][2]) >> 8));
-                var cb = (byte) Math.Min(255, Math.Max(0, ((-43*colors[i][0] - 85*colors[i][1] + 128*colors[i][2]) >> 8) + (1 << 7)));
-                var cr = (byte) Math.Min(255, Math.Max(0, (((1 << 7)*colors[i][0] - 107*colors[i][1] - 21*colors[i][2]) >> 8) + (1 << 7)));
-                result[i] = new Vector<byte>(new[] {y, cb, cr});
-            }
-            return result;
-        }
-
-        private static Vector<byte>[] TransformYCbCrToRGB(Vector<byte>[] colors)
-        {
-            var result = new Vector<byte>[colors.Length];
-            for (var i = 0; i < colors.Length; i++)
-            {
-                var r = (byte) Math.Min(255, Math.Max(0, colors[i][0] + ((colors[i][2] - 128) << 8) / 183));
-                var g = (byte) Math.Min(255, Math.Max(0, colors[i][0] - (5329 * (colors[i][1] - 128) + 11103 * (colors[i][2] - 128)) / 15481));
-                var b = (byte) Math.Min(255, Math.Max(0, colors[i][0] + ((colors[i][1] - 128) << 8) / 144));
-                result[i] = new Vector<byte>(new[] { r, g, b });
-            }
-            return result;
-        }
-
 
         public static readonly Dictionary<EffectType, Func<BitmapSource, object, BitmapSource>> EffectByType = new Dictionary
             <EffectType, Func<BitmapSource, object, BitmapSource>>

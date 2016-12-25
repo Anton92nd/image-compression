@@ -101,7 +101,7 @@ namespace ImageCompression
             {
                 string errorMessage;
                 DctParameters dctParameters;
-                if (!ValidateDct(effectType, EffectParameterComboBox.Text, out errorMessage, out dctParameters))
+                if (!ValidateDct(out errorMessage, out dctParameters))
                 {
                     
                     MessageBox.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -117,9 +117,64 @@ namespace ImageCompression
             return true;
         }
 
-        private bool ValidateDct(EffectType effectType, string text, out string errorMessage, out DctParameters dctParameters)
+        private bool ValidateDct(out string errorMessage, out DctParameters dctParameters)
         {
-            throw new NotImplementedException();
+            dctParameters = new DctParameters
+            {
+                DecimationType = (DecimationType)ComboBox_Decimation.SelectedIndex,
+                QuantizationType = (QuantizationType)ComboBox_Quantization.SelectedIndex
+            };
+            switch (dctParameters.QuantizationType)
+            {
+                case QuantizationType.LargestN:
+                    int n;
+                    if (!int.TryParse(JPG_FirstParameter.Text, out n) || n < 1 || n > 64)
+                    {
+                        errorMessage = "N must be integer in [1, 64]";
+                        return false;
+                    }
+                    dctParameters.N = n;
+                    break;
+                case QuantizationType.QuantizationMatrix:
+                    int alphaY, alphaC, gammaY, gammaC;
+                    if (!int.TryParse(JPG_FirstParameter.Text, out alphaY))
+                    {
+                        errorMessage = "\u03B1_Y must be integer";
+                        return false;
+                    }
+                    if (!int.TryParse(JPG_SecondParameter.Text, out gammaY))
+                    {
+                        errorMessage = "\u0263_Y must be integer";
+                        return false;
+                    }
+                    if (!int.TryParse(JPG_ThirdParameter.Text, out alphaC))
+                    {
+                        errorMessage = "\u03B1_C must be integer";
+                        return false;
+                    }
+                    if (!int.TryParse(JPG_FourthParameter.Text, out gammaC))
+                    {
+                        errorMessage = "\u0263_C must be integer";
+                        return false;
+                    }
+                    dctParameters.GeneratorsY = new MatrixGenerators
+                    {
+                        Alpha = alphaY,
+                        Gamma = gammaY,
+                    };
+                    dctParameters.GeneratorsC = new MatrixGenerators
+                    {
+                        Alpha = alphaC,
+                        Gamma = gammaC,
+                    };
+                    break;
+                case QuantizationType.DefaultJpegMatrix:
+                    break;
+                default:
+                    throw new Exception("Invalid program state");
+            }
+            errorMessage = string.Empty;
+            return true;
         }
 
         private bool ValidateParameter(EffectType effectType, [CanBeNull] string text, out string errorMessage, out object result)
