@@ -363,7 +363,6 @@ namespace ImageCompression
 
         private void ComboBoxEffects_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            JPG_Status.Text = "";
             var effectType = (EffectType) ComboBoxEffects.SelectedIndex;
             var parameter = effectType.GetParameter();
             if (parameter != null)
