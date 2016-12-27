@@ -119,6 +119,7 @@ namespace ImageCompression
                     return false;
                 }
                 result = Effects.EffectByType[effectType](bitmap, dctParameters);
+                return false;
             }
             else
             {

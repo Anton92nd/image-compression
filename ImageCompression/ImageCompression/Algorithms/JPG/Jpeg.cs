@@ -2,6 +2,7 @@
 using System.IO;
 using ImageCompression.Algorithms.DiscreteCosineTransform;
 using ImageCompression.Structures;
+using SevenZip;
 
 namespace ImageCompression.Algorithms.JPG
 {
@@ -10,7 +11,8 @@ namespace ImageCompression.Algorithms.JPG
         public static void Save(Vector<int>[,] data, DctParameters parameters)
         {
             using (var fileStream = File.Open(parameters.SavePath, FileMode.Create))
-            using (var writer = new BinaryWriter(fileStream))
+            using (var encodeStream = new LzmaEncodeStream(fileStream))
+            using (var writer = new BinaryWriter(encodeStream))
             {
                 writer.Write((byte)parameters.DecimationType);
                 writer.Write((byte)parameters.QuantizationType);
@@ -51,7 +53,8 @@ namespace ImageCompression.Algorithms.JPG
         public static Vector<int>[,] Load(DctParameters parameters)
         {
             using (var fileStream = File.Open(parameters.SavePath, FileMode.Open))
-            using (var reader = new BinaryReader(fileStream))
+            using (var decodeStream = new LzmaDecodeStream(fileStream))
+            using (var reader = new BinaryReader(decodeStream))
             {
                 parameters.DecimationType = (DecimationType) reader.ReadByte();
                 parameters.QuantizationType = (QuantizationType) reader.ReadByte();
