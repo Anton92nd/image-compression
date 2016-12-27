@@ -374,6 +374,11 @@ namespace ImageCompression
                 EffectParameterTextBlock.Visibility = Visibility.Visible;
                 EffectParameterComboBox.Visibility = Visibility.Visible;
             }
+            else
+            {
+                EffectParameterTextBlock.Visibility = Visibility.Hidden;
+                EffectParameterComboBox.Visibility = Visibility.Hidden;
+            }
             DctGrid.Visibility = effectType == EffectType.Dct ? Visibility.Visible : Visibility.Hidden;
         }
 
