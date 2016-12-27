@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ImageCompression.Structures
@@ -18,6 +19,7 @@ namespace ImageCompression.Structures
         public T this[int index]
         {
             get { return elements[index]; }
+            set { elements[index] = value; }
         }
 
         public int Length
@@ -51,6 +53,11 @@ namespace ImageCompression.Structures
                 }
             }
             return sum;
+        }
+
+        public Vector<T2> Convert<T2>(Func<T, T2> convertationFunc)
+        {
+            return new Vector<T2>(elements.Select(convertationFunc));
         }
 
         public override string ToString()

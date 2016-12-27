@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ImageCompression.Algorithms;
 using ImageCompression.Algorithms.DiscreteCosineTransform;
+using ImageCompression.Algorithms.JPG;
 using ImageCompression.Algorithms.LBG;
 using ImageCompression.Algorithms.MedianCutting;
 using ImageCompression.Extensions;
@@ -78,7 +79,9 @@ namespace ImageCompression
         public static BitmapSource ApplyDiscreteCosineTransform(BitmapSource bitmap, object parameter)
         {
             var dctParameters = (DctParameters) parameter;
-            return bitmap.Create(DctAlgorithm.Build(bitmap, dctParameters));
+            var encoded = DctAlgorithm.ApplyDct(bitmap, dctParameters);
+            Jpeg.Save(encoded, dctParameters);
+            return null;
         }
 
         public static BitmapSource QuantizeInRgb(BitmapSource bitmap, object parameter)

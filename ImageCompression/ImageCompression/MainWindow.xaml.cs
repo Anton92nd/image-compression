@@ -45,12 +45,17 @@ namespace ImageCompression
             var image = LoadImage();
             if (image != null)
             {
-                LeftImageBox.Source = image;
-                ButtonApplyLeft.IsEnabled = true;
-                leftHistory.Add(image);
-                MenuUndoLeft.IsEnabled = leftHistory.Count > 1;
-                MenuRedoLeft.IsEnabled = false;
+                PushLeft(image);
             }
+        }
+
+        private void PushLeft(BitmapSource image)
+        {
+            LeftImageBox.Source = image;
+            ButtonApplyLeft.IsEnabled = true;
+            leftHistory.Add(image);
+            MenuUndoLeft.IsEnabled = leftHistory.Count > 1;
+            MenuRedoLeft.IsEnabled = false;
         }
 
         private void MenuItem_Left_Save_OnClick(object sender, RoutedEventArgs e)
@@ -63,12 +68,17 @@ namespace ImageCompression
             var image = LoadImage();
             if (image != null)
             {
-                RightImageBox.Source = image;
-                ButtonApplyRight.IsEnabled = true;
-                rightHistory.Add(image);
-                MenuUndoRight.IsEnabled = rightHistory.Count > 1;
-                MenuRedoRight.IsEnabled = false;
+                PushRight(image);
             }
+        }
+
+        private void PushRight(BitmapSource image)
+        {
+            RightImageBox.Source = image;
+            ButtonApplyRight.IsEnabled = true;
+            rightHistory.Add(image);
+            MenuUndoRight.IsEnabled = rightHistory.Count > 1;
+            MenuRedoRight.IsEnabled = false;
         }
 
         private void MenuItem_Right_Save_OnClick(object sender, RoutedEventArgs e)
@@ -122,18 +132,25 @@ namespace ImageCompression
             dctParameters = new DctParameters
             {
                 DecimationType = (DecimationType)ComboBox_Decimation.SelectedIndex,
-                QuantizationType = (QuantizationType)ComboBox_Quantization.SelectedIndex
+                QuantizationType = (QuantizationType)ComboBox_Quantization.SelectedIndex,
+                SavePath = JPG_SavePath.Text,
             };
             switch (dctParameters.QuantizationType)
             {
                 case QuantizationType.LargestN:
-                    int n;
-                    if (!int.TryParse(JPG_FirstParameter.Text, out n) || n < 1 || n > 64)
+                    int ny, nc;
+                    if (!int.TryParse(JPG_FirstParameter.Text, out ny) || ny < 1 || ny > 64)
                     {
-                        errorMessage = "N must be integer in [1, 64]";
+                        errorMessage = "N_Y must be integer in [1, 64]";
                         return false;
                     }
-                    dctParameters.N = n;
+                    if (!int.TryParse(JPG_SecondParameter.Text, out nc) || nc < 1 || nc > 64)
+                    {
+                        errorMessage = "N_C must be integer in [1, 64]";
+                        return false;
+                    }
+                    dctParameters.Ny = ny;
+                    dctParameters.Nc = nc;
                     break;
                 case QuantizationType.QuantizationMatrix:
                     int alphaY, alphaC, gammaY, gammaC;
@@ -345,6 +362,7 @@ namespace ImageCompression
 
         private void ComboBoxEffects_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            JPG_Status.Text = "";
             var effectType = (EffectType) ComboBoxEffects.SelectedIndex;
             var parameter = effectType.GetParameter();
             if (parameter != null)
@@ -388,8 +406,8 @@ namespace ImageCompression
                     JPG_SecondParameter.Text = "10";
                     JPG_FirstText.Visibility = Visibility.Visible;
                     JPG_FirstParameter.Visibility = Visibility.Visible;
-                    JPG_SecondText.Visibility = Visibility.Hidden;
-                    JPG_SecondParameter.Visibility = Visibility.Hidden;
+                    JPG_SecondText.Visibility = Visibility.Visible;
+                    JPG_SecondParameter.Visibility = Visibility.Visible;
                     JPG_ThirdText.Visibility = Visibility.Hidden;
                     JPG_ThirdParameter.Visibility = Visibility.Hidden;
                     JPG_FourthText.Visibility = Visibility.Hidden;
@@ -426,6 +444,70 @@ namespace ImageCompression
                 default:
                     throw new Exception("Invalid program state");
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var saveFileDialog = new SaveFileDialog
+            {
+                AddExtension = true,
+                Filter = "MyJPEG Image Files (*.myjpg)|*.myjpg",
+                DefaultExt = "myjpg"
+            };
+            var showResult = saveFileDialog.ShowDialog();
+            if (showResult.HasValue && showResult.Value)
+            {
+                JPG_SavePath.Text = saveFileDialog.FileName;
+            }
+        }
+
+        private void MenuItem_Left_OpenJPG_OnClick(object sender, RoutedEventArgs e)
+        {
+            var image = LoadMyJpeg();
+            if (image != null)
+            {
+                PushLeft(image);
+            }
+        }
+
+        private void MenuItem_Right_OpenJPG_OnClick(object sender, RoutedEventArgs e)
+        {
+            var image = LoadMyJpeg();
+            if (image != null)
+            {
+                PushRight(image);
+            }
+        }
+
+        private BitmapSource LoadMyJpeg()
+        {
+            var parameters = GetDctParameters();
+            if (parameters.SavePath == null)
+                return null;
+            return DctAlgorithm.DecodeDct(parameters);
+        }
+
+        private DctParameters GetDctParameters()
+        {
+            return new DctParameters
+            {
+                SavePath = GetSavePath(),
+            };
+        }
+
+        private string GetSavePath()
+        {
+            var openFile = new OpenFileDialog
+            {
+                Multiselect = false,
+                Filter = "MyJPEG Image Files (*.myjpg)|*.myjpg"
+            };
+            var result = openFile.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                return openFile.FileName;
+            }
+            return null;
         }
 
         private readonly PersistentStack<BitmapSource> leftHistory = new PersistentStack<BitmapSource>();

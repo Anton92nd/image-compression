@@ -11,6 +11,7 @@
                 <MenuItem Header="_Save image" Click="MenuItem_Left_Save_OnClick"/>
                 <MenuItem Header="_Undo" Name="MenuUndoLeft" IsEnabled="False" Click="MenuItem_UndoLeft_Click"/>
                 <MenuItem Header="_Redo" Name="MenuRedoLeft" IsEnabled="False" Click="MenuItem_RedoLeft_Click"/>
+                <MenuItem Header="Open MyJpeg" Click="MenuItem_Left_OpenJPG_OnClick"/>
             </MenuItem>
             <MenuItem Header="_Right">
                 <MenuItem Header="_Copy to left" Click="MenuItem_RightToLeft_OnClick"/>
@@ -18,6 +19,7 @@
                 <MenuItem Header="_Save image" Click="MenuItem_Right_Save_OnClick"/>
                 <MenuItem Header="_Undo" Name="MenuUndoRight" IsEnabled="False" Click="MenuItem_UndoRight_Click"/>
                 <MenuItem Header="_Redo" Name="MenuRedoRight" IsEnabled="False" Click="MenuItem_RedoRight_Click"/>
+                <MenuItem Header="Open MyJpeg" Click="MenuItem_Right_OpenJPG_OnClick"/>
             </MenuItem>
         </Menu>
         <Border BorderThickness="1" BorderBrush="Black" Margin="10,29,612,130">
@@ -33,19 +35,23 @@
         <TextBlock HorizontalAlignment="Left" Height="23" Margin="46,565,0,0" TextWrapping="Wrap" Text="Choose effect:" VerticalAlignment="Top" Width="79"/>
         <ComboBox Name="EffectParameterComboBox" Visibility="Hidden" IsEditable="True" HorizontalAlignment="Left" Height="23" Margin="223,620,0,0" VerticalAlignment="Top" Width="120"/>
         <TextBlock Name="EffectParameterTextBlock" Visibility="Hidden" HorizontalAlignment="Left" Margin="46,620,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="23" Width="150"/>
-        <Grid Name="DctGrid" Visibility="Visible" HorizontalAlignment="Left" Height="100" Margin="366,560,0,0" VerticalAlignment="Top" Width="393">
+        <Grid Name="DctGrid" Visibility="Visible" HorizontalAlignment="Left" Height="116" Margin="365,546,0,0" VerticalAlignment="Top" Width="393">
             <TextBlock HorizontalAlignment="Left" Margin="37,10,0,0" TextWrapping="Wrap" Text="Decimation type:" VerticalAlignment="Top"/>
             <ComboBox Name="ComboBox_Decimation" Loaded="ComboBox_Decimation_OnLoaded" HorizontalAlignment="Left" Margin="160,4,0,0" VerticalAlignment="Top" Width="150"/>
-            <TextBlock HorizontalAlignment="Left" Margin="37,37,0,0" TextWrapping="Wrap" Text="Quantization type:" VerticalAlignment="Top" RenderTransformOrigin="-0.204,-0.062"/>
+            <TextBlock HorizontalAlignment="Left" Margin="37,31,0,0" TextWrapping="Wrap" Text="Quantization type:" VerticalAlignment="Top" RenderTransformOrigin="-0.204,-0.062"/>
             <ComboBox Name="ComboBox_Quantization" Loaded="ComboBox_Quantization_OnLoaded" SelectionChanged="ComboBox_Quantization_OnSelectionChanged" HorizontalAlignment="Left" Margin="160,31,0,0" VerticalAlignment="Top" Width="150"/>
-            <TextBlock Name="JPG_FirstText" HorizontalAlignment="Left" Margin="37,74,0,0" TextWrapping="Wrap" Text="N_Y:" VerticalAlignment="Top" RenderTransformOrigin="0.492,-1.065"/>
-            <ComboBox Name="JPG_FirstParameter" IsEditable="True" HorizontalAlignment="Left" Margin="68,72,0,0" VerticalAlignment="Top" Width="58"/>
-            <TextBlock Name="JPG_SecondText" HorizontalAlignment="Left" Margin="141,74,0,0" TextWrapping="Wrap" Text="N_C:" VerticalAlignment="Top" RenderTransformOrigin="0.204,1.812"/>
-            <ComboBox Name="JPG_SecondParameter" IsEditable="True" HorizontalAlignment="Left" Margin="170,71,0,0" VerticalAlignment="Top" Width="47"/>
-            <TextBlock Name="JPG_ThirdText" HorizontalAlignment="Left" Height="23" Margin="236,74,0,0" TextWrapping="Wrap" Text="&#x3B1;_Y:" VerticalAlignment="Top" Width="31" RenderTransformOrigin="1.271,0.783"/>
-            <ComboBox Name="JPG_ThirdParameter" IsEditable="True" HorizontalAlignment="Left" Margin="267,71,0,0" VerticalAlignment="Top" Width="42"/>
-            <TextBlock Name="JPG_FourthText" HorizontalAlignment="Left" Margin="314,74,0,0" TextWrapping="Wrap" Text="&#x263;_C:" VerticalAlignment="Top"/>
-            <ComboBox Name="JPG_FourthParameter" IsEditable="True" HorizontalAlignment="Left" Margin="340,71,0,0" VerticalAlignment="Top" Width="43" RenderTransformOrigin="1.233,0.545"/>
+            <TextBlock Name="JPG_FirstText" HorizontalAlignment="Left" Margin="37,58,0,0" TextWrapping="Wrap" Text="N_Y:" VerticalAlignment="Top" RenderTransformOrigin="0.492,-1.065"/>
+            <ComboBox Name="JPG_FirstParameter" IsEditable="True" HorizontalAlignment="Left" Margin="76,58,0,0" VerticalAlignment="Top" Width="58"/>
+            <TextBlock Name="JPG_SecondText" HorizontalAlignment="Left" Margin="141,58,0,0" TextWrapping="Wrap" Text="N_C:" VerticalAlignment="Top" RenderTransformOrigin="0.204,1.812"/>
+            <ComboBox Name="JPG_SecondParameter" IsEditable="True" HorizontalAlignment="Left" Margin="170,58,0,0" VerticalAlignment="Top" Width="47"/>
+            <TextBlock Name="JPG_ThirdText" HorizontalAlignment="Left" Height="23" Margin="222,60,0,0" TextWrapping="Wrap" Text="&#x3B1;_Y:" VerticalAlignment="Top" Width="31" RenderTransformOrigin="1.271,0.783"/>
+            <ComboBox Name="JPG_ThirdParameter" IsEditable="True" HorizontalAlignment="Left" Margin="253,58,0,0" VerticalAlignment="Top" Width="42"/>
+            <TextBlock Name="JPG_FourthText" HorizontalAlignment="Left" Margin="314,58,0,0" TextWrapping="Wrap" Text="&#x263;_C:" VerticalAlignment="Top" RenderTransformOrigin="1.445,3.634"/>
+            <ComboBox Name="JPG_FourthParameter" IsEditable="True" HorizontalAlignment="Left" Margin="340,58,0,0" VerticalAlignment="Top" Width="43" RenderTransformOrigin="1.233,0.545"/>
+            <TextBlock HorizontalAlignment="Left" Margin="10,90,0,0" TextWrapping="Wrap" Text="Save path: " VerticalAlignment="Top"/>
+            <ComboBox IsEditable="True" Name="JPG_SavePath" Text="C:\temp\image.myjpg" HorizontalAlignment="Left" Margin="73,87,0,0" VerticalAlignment="Top" Width="120"/>
+            <Button Content="Choose path" HorizontalAlignment="Left" Margin="198,87,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+            <TextBlock Name="JPG_Status" HorizontalAlignment="Left" Margin="299,87,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="20" Width="84"/>
         </Grid>
     </Grid>
 </Window>
