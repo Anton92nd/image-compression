@@ -23,7 +23,7 @@ namespace ImageCompression.Extensions
                 var saveFile = new SaveFileDialog
                 {
                     AddExtension = true,
-                    Filter = "Image Files (*png, *.bmp, *.tiff)|*.png;*.bmp;*.tiff",
+                    Filter = "Image Files (*.png, *.bmp, *.tiff)|*.png;*.bmp;*.tiff",
                     DefaultExt = "png",
                 };
                 var result = saveFile.ShowDialog();
