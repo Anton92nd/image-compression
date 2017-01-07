@@ -9,7 +9,7 @@ namespace ImageCompression.Algorithms.Wavelets
 {
     public static class Wavelet
     {
-        public static BitmapSource ApplyWavelet(BitmapSource bitmap, WaveletType waveletType, int count)
+        public static BitmapSource ApplyWavelet(BitmapSource bitmap, WaveletParameters waveletParameters)
         {
             if (bitmap.Format != PixelFormats.Gray8)
             {
@@ -18,13 +18,13 @@ namespace ImageCompression.Algorithms.Wavelets
                 var channels = GetChannels(colors, bitmap.PixelHeight, bitmap.PixelWidth);
                 for (var channel = 0; channel < 3; ++channel)
                 {
-                    DoApplyWavelet(channels[channel], waveletType, count);
+                    DoApplyWavelet(channels[channel], waveletParameters);
                 }
                 return bitmap.Create(ToColors(channels));
             }
             var bytes = bitmap.GetBytes();
             var channl = GetChannel(bytes, bitmap.PixelHeight, bitmap.PixelWidth);
-            DoApplyWavelet(channl, waveletType, count);
+            DoApplyWavelet(channl, waveletParameters);
             return bitmap.Create(ToGrey(channl));
         }
 
@@ -66,17 +66,17 @@ namespace ImageCompression.Algorithms.Wavelets
 
         private static byte ToByte(double d)
         {
-            return Convert.ToByte(Math.Max(0.0, Math.Min(255.0, d * 255.0)));
+            return Convert.ToByte(Math.Max(0.0, Math.Min(255.0, Math.Abs(d) * 255.0)));
         }
 
-        private static void DoApplyWavelet(double[,] channel, WaveletType waveletType, int count)
+        private static void DoApplyWavelet(double[,] channel, WaveletParameters waveletParameters)
         {
-            var lowerCoefs = GetCoefsByWaveletType(waveletType);
+            var lowerCoefs = GetCoefsByWaveletType(waveletParameters.WaveletType);
             var higherCoefs = GetHighPassFilter(lowerCoefs);
             var height = channel.GetLength(0);
             var width = channel.GetLength(1);
             var result = new double[height, width];
-            for (var counter = 0; counter < count; ++counter)
+            for (var counter = 0; counter < waveletParameters.IterationsCount; ++counter)
             {
                 var line = new double[width];
                 for (var i = 0; i < height; ++i)
@@ -113,6 +113,11 @@ namespace ImageCompression.Algorithms.Wavelets
                 height >>= 1;
                 width >>= 1;
             }
+            height = channel.GetLength(0);
+            width = channel.GetLength(1);
+            for (var i = 0; i < height; ++i)
+                for (var j = 0; j < width; ++j)
+                    channel[i, j] = channel[i, j] < waveletParameters.Threshold ? 0.0 : channel[i, j];
         }
 
         private static double[] GetCoefsByWaveletType(WaveletType waveletType)

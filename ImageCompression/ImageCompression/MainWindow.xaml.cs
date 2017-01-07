@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using ImageCompression.Algorithms.DiscreteCosineTransform;
+using ImageCompression.Algorithms.Wavelets;
 using ImageCompression.Extensions;
 using ImageCompression.Structures;
 using JetBrains.Annotations;
@@ -378,7 +379,8 @@ namespace ImageCompression
                 EffectParameterTextBlock.Visibility = Visibility.Hidden;
                 EffectParameterComboBox.Visibility = Visibility.Hidden;
             }
-            DctGrid.Visibility = effectType == EffectType.Dct ? Visibility.Visible : Visibility.Hidden;
+            WaveletBorder.Visibility = effectType == EffectType.Wavelet ? Visibility.Visible : Visibility.Hidden;
+            DctBorder.Visibility = effectType == EffectType.Dct ? Visibility.Visible : Visibility.Hidden;
         }
 
         private void ComboBoxEffects_OnLoaded(object sender, RoutedEventArgs e)
@@ -397,6 +399,12 @@ namespace ImageCompression
         {
             ComboBox_Quantization.ItemsSource = typeof(QuantizationType).GetEnumValues<QuantizationType>().Select(el => el.GetText());
             ComboBox_Quantization.SelectedIndex = 0;
+        }
+
+        private void WaveletComboBox_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            WaveletTypeComboBox.ItemsSource = typeof(WaveletType).GetEnumValues<WaveletType>().Select(el => el.GetText());
+            WaveletTypeComboBox.SelectedIndex = 0;
         }
 
         private void ComboBox_Quantization_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -463,6 +471,21 @@ namespace ImageCompression
             if (showResult.HasValue && showResult.Value)
             {
                 JPG_SavePath.Text = saveFileDialog.FileName;
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var saveFileDialog = new SaveFileDialog
+            {
+                AddExtension = true,
+                Filter = "MyJPEG Image Files (*.wlt)|*.wlt",
+                DefaultExt = "wlt"
+            };
+            var showResult = saveFileDialog.ShowDialog();
+            if (showResult.HasValue && showResult.Value)
+            {
+                WaveletSavePath.Text = saveFileDialog.FileName;
             }
         }
 

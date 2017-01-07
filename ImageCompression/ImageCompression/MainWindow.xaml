@@ -35,7 +35,7 @@
         <TextBlock HorizontalAlignment="Left" Height="23" Margin="46,565,0,0" TextWrapping="Wrap" Text="Choose effect:" VerticalAlignment="Top" Width="79"/>
         <ComboBox Name="EffectParameterComboBox" Visibility="Hidden" IsEditable="True" HorizontalAlignment="Left" Height="23" Margin="223,620,0,0" VerticalAlignment="Top" Width="120"/>
         <TextBlock Name="EffectParameterTextBlock" Visibility="Hidden" HorizontalAlignment="Left" Margin="46,620,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="23" Width="150"/>
-        <Border Name="DctGrid" Visibility="Visible" BorderThickness="1" BorderBrush="Black" Margin="365,546,360,0">
+        <Border Name="DctBorder" Visibility="Hidden" BorderThickness="1" BorderBrush="Black" Margin="365,546,360,0">
             <Grid HorizontalAlignment="Left" Height="116"  VerticalAlignment="Top" Width="393">
                 <TextBlock HorizontalAlignment="Left" Margin="37,10,0,0" TextWrapping="Wrap" Text="Decimation type:" VerticalAlignment="Top"/>
                 <ComboBox Name="ComboBox_Decimation" Loaded="ComboBox_Decimation_OnLoaded" HorizontalAlignment="Left" Margin="160,4,0,0" VerticalAlignment="Top" Width="150"/>
@@ -52,6 +52,19 @@
                 <TextBlock HorizontalAlignment="Left" Margin="10,90,0,0" TextWrapping="Wrap" Text="Save path: " VerticalAlignment="Top"/>
                 <ComboBox IsEditable="True" Name="JPG_SavePath" Text="C:\temp\image.myjpg" HorizontalAlignment="Left" Margin="73,87,0,0" VerticalAlignment="Top" Width="221"/>
                 <Button Content="Choose path" HorizontalAlignment="Left" Margin="308,87,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+            </Grid>
+        </Border>
+        <Border Name="WaveletBorder" Visibility="Visible" BorderThickness="1" BorderBrush="Black" Margin="365,546,360,0">
+            <Grid HorizontalAlignment="Left" Height="125"  VerticalAlignment="Top" Width="393" Margin="-1,-1,0,-1">
+                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Wavelet type: " VerticalAlignment="Top"/>
+                <ComboBox Name="WaveletTypeComboBox" IsEditable="False" Loaded="WaveletComboBox_OnLoaded" HorizontalAlignment="Left" Margin="89,10,0,0" VerticalAlignment="Top" Width="120"/>
+                <TextBlock HorizontalAlignment="Left" Margin="10,43,0,0" TextWrapping="Wrap" Text="Iterations count: " VerticalAlignment="Top" Height="22" Width="91"/>
+                <ComboBox Name="WaveletIterationsComboBox" IsEditable="True" Text="2" HorizontalAlignment="Left" Margin="106,40,0,0" VerticalAlignment="Top" Width="50" RenderTransformOrigin="0.88,2.227"/>
+                <TextBlock HorizontalAlignment="Left" Margin="175,43,0,0" TextWrapping="Wrap" Text="Threshold: " VerticalAlignment="Top" Height="19" Width="82"/>
+                <ComboBox Name="WaveletThresholdComboBox" IsEditable="True" Text="0.1" HorizontalAlignment="Left" Margin="244,40,0,0" VerticalAlignment="Top" Width="82"/>
+                <TextBlock HorizontalAlignment="Left" Margin="10,80,0,0" TextWrapping="Wrap" Text="Save path: " VerticalAlignment="Top" Height="20" Width="74"/>
+                <ComboBox Name="WaveletSavePath" IsEditable="True" Text="C:\temp\abc.wlt" HorizontalAlignment="Left" Margin="89,80,0,0" VerticalAlignment="Top" Width="195"/>
+                <Button Content="Choose path" HorizontalAlignment="Left" Margin="308,81,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click_1"/>
             </Grid>
         </Border>
     </Grid>

@@ -87,7 +87,8 @@ namespace ImageCompression
 
         public static BitmapSource ApplyWaveletCompression(BitmapSource bitmap, object parameter)
         {
-            return Wavelet.ApplyWavelet(bitmap, WaveletType.D6, 2);
+            var waveletParameters = parameter as WaveletParameters;
+            return Wavelet.ApplyWavelet(bitmap, waveletParameters);
         }
 
         public static BitmapSource QuantizeInRgb(BitmapSource bitmap, object parameter)
