@@ -8,6 +8,7 @@ using ImageCompression.Algorithms.DiscreteCosineTransform;
 using ImageCompression.Algorithms.JPG;
 using ImageCompression.Algorithms.LBG;
 using ImageCompression.Algorithms.MedianCutting;
+using ImageCompression.Algorithms.Wavelets;
 using ImageCompression.Extensions;
 using ImageCompression.Structures;
 
@@ -84,6 +85,11 @@ namespace ImageCompression
             return null;
         }
 
+        public static BitmapSource ApplyWaveletCompression(BitmapSource bitmap, object parameter)
+        {
+            return Wavelet.ApplyWavelet(bitmap, WaveletType.D6, 2);
+        }
+
         public static BitmapSource QuantizeInRgb(BitmapSource bitmap, object parameter)
         {
             var quantizationVector = parameter as Vector<byte>;
@@ -115,6 +121,7 @@ namespace ImageCompression
             {EffectType.QuantizationRgb, (b, p) => QuantizeInRgb(b, p)},
             {EffectType.QuantizationYCrCb, (b, p) => QuantizeInYCbCr(b, p)},
             {EffectType.Dct, (b, p) => ApplyDiscreteCosineTransform(b, p)},
+            {EffectType.Wavelet, (b, p) => ApplyWaveletCompression(b, p)},
         };
 
         public static bool CanApply(BitmapSource bitmap, EffectType effectType)
@@ -137,7 +144,8 @@ namespace ImageCompression
             {EffectType.LindeBuzoGray, new []{PixelFormats.Bgr32}},
             {EffectType.QuantizationRgb, new []{PixelFormats.Bgr32}},
             {EffectType.QuantizationYCrCb, new []{PixelFormats.Bgr32}},
-            {EffectType.Dct, new []{PixelFormats.Bgr32}},
+            {EffectType.Dct, new []{PixelFormats.Bgr32, PixelFormats.Bgra32}},
+            {EffectType.Wavelet, new []{PixelFormats.Bgr32, PixelFormats.Bgra32, PixelFormats.Gray8, }},
         };
     }
 }

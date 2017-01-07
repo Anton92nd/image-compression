@@ -90,7 +90,7 @@ namespace ImageCompression
         {
             if (!Effects.CanApply(bitmap, effectType))
             {
-                MessageBox.Show("This effect is not supported for that image", "Error", MessageBoxButton.OK,
+                MessageBox.Show(string.Format("This effect is not supported for that image. Image format: {0}", bitmap.Format), "Error", MessageBoxButton.OK,
                     MessageBoxImage.Exclamation);
                 result = null;
                 return false;

@@ -74,6 +74,8 @@
     <Compile Include="Algorithms\MedianCutting\MedianCut.cs" />
     <Compile Include="Algorithms\Quantization.cs" />
     <Compile Include="Algorithms\Transformation.cs" />
+    <Compile Include="Algorithms\Wavelets\Wavelet.cs" />
+    <Compile Include="Algorithms\Wavelets\WaveletType.cs" />
     <Compile Include="Attributes\ParameterAttribute.cs" />
     <Compile Include="Attributes\TextAttribute.cs" />
     <Compile Include="Effects.cs" />

@@ -40,5 +40,8 @@ namespace ImageCompression
 
         [Text("Discrete cosine transform")]
         Dct,
+
+        [Text("Wavelet compression")]
+        Wavelet,
     }
 }
