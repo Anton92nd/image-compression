@@ -122,10 +122,51 @@ namespace ImageCompression
                 result = Effects.EffectByType[effectType](bitmap, dctParameters);
                 return false;
             }
+            else if (effectType == EffectType.Wavelet)
+            {
+                string errorMessage;
+                WaveletParameters waveletParameters;
+                if (!ValidateWavelet(out errorMessage, out waveletParameters))
+                {
+
+                    MessageBox.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    result = null;
+                    return false;
+                }
+                result = Effects.EffectByType[effectType](bitmap, waveletParameters);
+                return true;
+            }
             else
             {
                 result = Effects.EffectByType[effectType](bitmap, null);
             }
+            return true;
+        }
+
+        private bool ValidateWavelet(out string errorMessage, out WaveletParameters waveletParameters)
+        {
+            waveletParameters = null;
+            int iterationsCount;
+            if (!int.TryParse(WaveletIterationsComboBox.Text, out iterationsCount) || iterationsCount <= 0 ||
+                iterationsCount > 7)
+            {
+                errorMessage = "Iterations count must be integer in [1..7]";
+                return false;
+            }
+            double threshold;
+            if (!double.TryParse(WaveletThresholdComboBox.Text, out threshold) || threshold < 0 || threshold > 1)
+            {
+                errorMessage = "Threshold must be real in [0, 1]";
+                return false;
+            }
+            waveletParameters = new WaveletParameters
+            {
+                WaveletType = (WaveletType) WaveletTypeComboBox.SelectedIndex,
+                SavePath = WaveletSavePath.Text,
+                IterationsCount = iterationsCount,
+                Threshold = threshold,
+            };
+            errorMessage = null;
             return true;
         }
 

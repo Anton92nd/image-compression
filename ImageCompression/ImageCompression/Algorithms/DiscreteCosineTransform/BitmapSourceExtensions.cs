@@ -9,8 +9,8 @@ namespace ImageCompression.Algorithms.DiscreteCosineTransform
     {
         public static Vector<byte>[,] GetMap(this BitmapSource bitmap)
         {
-            if (bitmap.Format != PixelFormats.Bgr32)
-                throw new NotSupportedException();
+            //if (bitmap.Format != PixelFormats.Bgr32)
+            //    throw new NotSupportedException();
             var stride = bitmap.PixelWidth * (bitmap.Format.BitsPerPixel / 8);
             var bytes = new byte[bitmap.PixelHeight * stride];
             bitmap.CopyPixels(bytes, stride, 0);
