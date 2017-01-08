@@ -154,9 +154,9 @@ namespace ImageCompression
                 return false;
             }
             double threshold;
-            if (!double.TryParse(WaveletThresholdComboBox.Text, out threshold) || threshold < 0 || threshold > 1)
+            if (!double.TryParse(WaveletThresholdComboBox.Text, out threshold) || threshold < 0)
             {
-                errorMessage = "Threshold must be real in [0, 1]";
+                errorMessage = "Threshold must be real not less than 0";
                 return false;
             }
             waveletParameters = new WaveletParameters
@@ -548,6 +548,32 @@ namespace ImageCompression
             }
         }
 
+        private void MenuItem_Left_OpenWavelet_OnClick(object sender, RoutedEventArgs e)
+        {
+            var image = LoadWavelet();
+            if (image != null)
+            {
+                PushLeft(image);
+            }
+        }
+
+        private void MenuItem_Right_OpenWavelet_OnClick(object sender, RoutedEventArgs e)
+        {
+            var image = LoadWavelet();
+            if (image != null)
+            {
+                PushRight(image);
+            }
+        }
+
+        private BitmapSource LoadWavelet()
+        {
+            var savePath = GetSavePath("Wavelet Image Files (*.wlt)|*.wlt");
+            if (savePath == null)
+                return null;
+            return Wavelet.OpenWavelet(savePath);
+        }
+
         private BitmapSource LoadMyJpeg()
         {
             var parameters = GetDctParameters();
@@ -560,16 +586,16 @@ namespace ImageCompression
         {
             return new DctParameters
             {
-                SavePath = GetSavePath(),
+                SavePath = GetSavePath("MyJPEG Image Files (*.myjpg)|*.myjpg"),
             };
         }
 
-        private string GetSavePath()
+        private string GetSavePath(string filter)
         {
             var openFile = new OpenFileDialog
             {
                 Multiselect = false,
-                Filter = "MyJPEG Image Files (*.myjpg)|*.myjpg"
+                Filter = filter,
             };
             var result = openFile.ShowDialog();
             if (result.HasValue && result.Value)

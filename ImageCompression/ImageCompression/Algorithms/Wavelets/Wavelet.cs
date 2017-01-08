@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ImageCompression.Extensions;
 using ImageCompression.Structures;
+using SevenZip;
 
 namespace ImageCompression.Algorithms.Wavelets
 {
@@ -31,10 +32,32 @@ namespace ImageCompression.Algorithms.Wavelets
             return bitmap.Create(ToGrey(channl));
         }
 
+        public static BitmapSource OpenWavelet(string path)
+        {
+            using (var inputStream = File.OpenRead(path))
+            using (var decodeStream = new LzmaDecodeStream(inputStream))
+            using (var reader = new BinaryReader(decodeStream))
+            {
+                var pixelHeight = reader.ReadInt32();
+                var pixelWidth = reader.ReadInt32();
+                var dpiX = reader.ReadDouble();
+                var dpiY = reader.ReadDouble();
+                var waveletType = (WaveletType) reader.ReadByte();
+                var iterationsCount = reader.ReadInt32();
+                var channelsCount = reader.ReadInt32();
+                var channels = new Vector<double[,]>(channelsCount);
+                for (var i = 0; i < channelsCount; ++i)
+                    channels[i] = DecodeChannel(ReadChannel(reader), waveletType, iterationsCount);
+                var pixels = GetBytes(channels);
+                return BitmapSource.Create(pixelWidth, pixelHeight, dpiX, dpiY, channelsCount == 1 ? PixelFormats.Gray8 : PixelFormats.Bgr32, null, pixels, pixels.Length / pixelHeight);
+            }
+        }
+
         private static void SaveWavelet(BitmapSource bitmap, WaveletParameters parameters, Vector<double[,]> channels)
         {
             using (var outputStream = File.Open(parameters.SavePath, FileMode.Create))
-            using (var writer = new BinaryWriter(outputStream))
+            using (var encodeStream = new LzmaEncodeStream(outputStream))
+            using (var writer = new BinaryWriter(encodeStream))
             {
                 writer.Write(bitmap.PixelHeight);
                 writer.Write(bitmap.PixelWidth);
@@ -42,14 +65,52 @@ namespace ImageCompression.Algorithms.Wavelets
                 writer.Write(bitmap.DpiY);
                 writer.Write((byte)parameters.WaveletType);
                 writer.Write(parameters.IterationsCount);
-                writer.Write(parameters.Threshold);
                 writer.Write(channels.Length);
                 for (var i = 0; i < channels.Length; ++i)
-                    EncodeChannel(writer, channels[i]);
+                    WriteChannel(writer, channels[i]);
             }
         }
 
-        private static void EncodeChannel(BinaryWriter writer, double[,] channel)
+        private static byte[] GetBytes(Vector<double[,]> channels)
+        {
+            var n = channels[0].GetLength(0);
+            var m = channels[0].GetLength(1);
+            var result = new byte[n*m*(channels.Length == 1 ? 1 : 4)];
+            for (var i = 0; i < n; ++i)
+            {
+                for (var j = 0; j < m; ++j)
+                {
+                    if (channels.Length == 1)
+                        result[i*m + j] = ToByte(channels[0][i, j]);
+                    else
+                    {
+                        var b = (i*m + j)*4;
+                        result[b] = ToByte(channels[2][i, j]);
+                        result[b + 1] = ToByte(channels[1][i, j]);
+                        result[b + 2] = ToByte(channels[0][i, j]);
+                        result[b + 3] = 255;
+                    }
+                }
+            }
+            return result;
+        }
+
+        private static double[,] ReadChannel(BinaryReader reader)
+        {
+            var n = reader.ReadInt32();
+            var m = reader.ReadInt32();
+            var channel = new double[n, m];
+            for (var i = 0; i < n; ++i)
+            {
+                for (var j = 0; j < m; ++j)
+                {
+                    channel[i, j] = reader.ReadInt32();
+                }
+            }
+            return channel;
+        }
+
+        private static void WriteChannel(BinaryWriter writer, double[,] channel)
         {
             var n = channel.GetLength(0);
             var m = channel.GetLength(1);
@@ -135,16 +196,9 @@ namespace ImageCompression.Algorithms.Wavelets
                 }
                 for (var i = 0; i < height; ++i)
                 {
-                    for (var j = 0; j < width; j += 2)
+                    for (var j = 0; j < width; ++j)
                     {
-                        channel[i%2 == 0 ? i/2 : height/2 + i/2, j/2] = result[i, j];
-                    }
-                }
-                for (var i = 0; i < height; ++i)
-                {
-                    for (var j = 1; j < width; j += 2)
-                    {
-                        channel[i%2 == 0 ? i/2 : height/2 + i/2, width/2 + j/2] = result[i, j];
+                        channel[i%2 == 0 ? i/2 : height/2 + i/2, j%2 == 0 ? j/2 : width/2 + j/2] = result[i, j];
                     }
                 }
                 height >>= 1;
@@ -157,15 +211,69 @@ namespace ImageCompression.Algorithms.Wavelets
                     channel[i, j] = Math.Abs(channel[i, j]) < waveletParameters.Threshold ? 0.0 : channel[i, j]*255.0;
         }
 
+        private static double[,] DecodeChannel(double[,] channel, WaveletType waveletType, int iterationsCount)
+        {
+            var lowerCoefs = GetCoefsByWaveletType(waveletType);
+            var higherCoefs = GetHighPassFilter(lowerCoefs);
+            double[] iLowerCoefs, iHigherCoefs;
+            GetInverseCoefs(lowerCoefs, higherCoefs, out iLowerCoefs, out iHigherCoefs);
+
+            var height = channel.GetLength(0);
+            var width = channel.GetLength(1);
+            var orderedChannel = new double[height, width];
+
+            height >>= iterationsCount - 1;
+            width >>= iterationsCount - 1;
+
+            for (var counter = 0; counter < iterationsCount; ++counter)
+            {
+                for (var i = 0; i < height; ++i)
+                {
+                    for (var j = 0; j < width; ++j)
+                    {
+                        orderedChannel[i, j] = channel[i%2 == 0 ? i/2 : height/2 + i/2, j%2 == 0 ? j/2 : width/2 + j/2];
+                    }
+                }
+                var line = new double[height];
+                for (var j = 0; j < width; ++j)
+                {
+                    for (var i = 0; i < height; ++i)
+                        line[i] = orderedChannel[i, j];
+                    var resultLine = PairConvolution(line, iLowerCoefs, iHigherCoefs, iLowerCoefs.Length - 2);
+                    for (var i = 0; i < height; ++i)
+                        channel[i, j] = resultLine[i];
+                }
+                line = new double[width];
+                for (var i = 0; i < height; ++i)
+                {
+                    for (var j = 0; j < width; ++j)
+                        line[j] = channel[i, j];
+                    var resultLine = PairConvolution(line, iLowerCoefs, iHigherCoefs, iLowerCoefs.Length - 2);
+                    for (var j = 0; j < width; ++j)
+                        channel[i, j] = resultLine[j];
+                }
+
+                height <<= 1;
+                width <<= 1;
+            }
+            return channel;
+        }
+
         private static double[] GetCoefsByWaveletType(WaveletType waveletType)
         {
             switch (waveletType)
             {
-                case WaveletType.Hoar:
+                case WaveletType.Hoar1:
                     return new[]
                     {
-                        1.0/2,//1.0/Math.Sqrt(2.0),
-                        1.0/2,//1.0/Math.Sqrt(2)
+                        1.0/2,
+                        1.0/2,
+                    };
+                case WaveletType.Hoar2:
+                    return new[]
+                    {
+                        1.0/Math.Sqrt(2.0),
+                        1.0/Math.Sqrt(2)
                     };
                 case WaveletType.D4:
                     return new[]
@@ -205,8 +313,7 @@ namespace ImageCompression.Algorithms.Wavelets
             var channel = new double[height, width];
             for (var i = 0; i < height; ++i)
                 for (var j = 0; j < width; ++j)
-                    for (var k = 0; k < 3; ++k)
-                        channel[i, j] = colors[i * width + j] / 255.0;
+                    channel[i, j] = colors[i * width + j] / 255.0;
             return channel;
         }
 
@@ -228,7 +335,7 @@ namespace ImageCompression.Algorithms.Wavelets
                 throw new Exception("Invalid program state");
             var n = lowerCoefs.Length;
             var m = data.Length;
-            var result = new double[data.Length];
+            var result = new double[m];
             for (var i = 0; i < m; i += 2)
             {
                 var sumLower = 0.0;

@@ -12,6 +12,7 @@
                 <MenuItem Header="_Undo" Name="MenuUndoLeft" IsEnabled="False" Click="MenuItem_UndoLeft_Click"/>
                 <MenuItem Header="_Redo" Name="MenuRedoLeft" IsEnabled="False" Click="MenuItem_RedoLeft_Click"/>
                 <MenuItem Header="Open MyJpeg" Click="MenuItem_Left_OpenJPG_OnClick"/>
+                <MenuItem Header="Open Wavelet" Click="MenuItem_Left_OpenWavelet_OnClick"/>
             </MenuItem>
             <MenuItem Header="_Right">
                 <MenuItem Header="_Copy to left" Click="MenuItem_RightToLeft_OnClick"/>
@@ -20,6 +21,7 @@
                 <MenuItem Header="_Undo" Name="MenuUndoRight" IsEnabled="False" Click="MenuItem_UndoRight_Click"/>
                 <MenuItem Header="_Redo" Name="MenuRedoRight" IsEnabled="False" Click="MenuItem_RedoRight_Click"/>
                 <MenuItem Header="Open MyJpeg" Click="MenuItem_Right_OpenJPG_OnClick"/>
+                <MenuItem Header="Open Wavelet" Click="MenuItem_Right_OpenWavelet_OnClick"/>
             </MenuItem>
         </Menu>
         <Border BorderThickness="1" BorderBrush="Black" Margin="10,29,612,130">
