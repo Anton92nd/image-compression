@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -20,12 +21,48 @@ namespace ImageCompression.Algorithms.Wavelets
                 {
                     DoApplyWavelet(channels[channel], waveletParameters);
                 }
+                SaveWavelet(bitmap, waveletParameters, channels);
                 return bitmap.Create(ToColors(channels));
             }
             var bytes = bitmap.GetBytes();
             var channl = GetChannel(bytes, bitmap.PixelHeight, bitmap.PixelWidth);
             DoApplyWavelet(channl, waveletParameters);
+            SaveWavelet(bitmap, waveletParameters, new Vector<double[,]>(new[] {channl}));
             return bitmap.Create(ToGrey(channl));
+        }
+
+        private static void SaveWavelet(BitmapSource bitmap, WaveletParameters parameters, Vector<double[,]> channels)
+        {
+            using (var outputStream = File.Open(parameters.SavePath, FileMode.Create))
+            using (var writer = new BinaryWriter(outputStream))
+            {
+                writer.Write(bitmap.PixelHeight);
+                writer.Write(bitmap.PixelWidth);
+                writer.Write(bitmap.DpiX);
+                writer.Write(bitmap.DpiY);
+                writer.Write((byte)parameters.WaveletType);
+                writer.Write(parameters.IterationsCount);
+                writer.Write(parameters.Threshold);
+                writer.Write(channels.Length);
+                for (var i = 0; i < channels.Length; ++i)
+                    EncodeChannel(writer, channels[i]);
+            }
+        }
+
+        private static void EncodeChannel(BinaryWriter writer, double[,] channel)
+        {
+            var n = channel.GetLength(0);
+            var m = channel.GetLength(1);
+            writer.Write(n);
+            writer.Write(m);
+            for (var i = 0; i < n; ++i)
+            {
+                for (var j = 0; j < m; ++j)
+                {
+                    var intValue = Convert.ToInt32(channel[i, j]);
+                    writer.Write(intValue);
+                }
+            }
         }
 
         private static Vector<byte>[] ToColors(Vector<double[,]> channels)
@@ -66,7 +103,7 @@ namespace ImageCompression.Algorithms.Wavelets
 
         private static byte ToByte(double d)
         {
-            return Convert.ToByte(Math.Max(0.0, Math.Min(255.0, Math.Abs(d) * 255.0)));
+            return Convert.ToByte(Math.Max(0.0, Math.Min(255.0, Math.Abs(d))));
         }
 
         private static void DoApplyWavelet(double[,] channel, WaveletParameters waveletParameters)
@@ -117,7 +154,7 @@ namespace ImageCompression.Algorithms.Wavelets
             width = channel.GetLength(1);
             for (var i = 0; i < height; ++i)
                 for (var j = 0; j < width; ++j)
-                    channel[i, j] = channel[i, j] < waveletParameters.Threshold ? 0.0 : channel[i, j];
+                    channel[i, j] = Math.Abs(channel[i, j]) < waveletParameters.Threshold ? 0.0 : channel[i, j]*255.0;
         }
 
         private static double[] GetCoefsByWaveletType(WaveletType waveletType)
