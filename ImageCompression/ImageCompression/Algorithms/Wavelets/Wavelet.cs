@@ -263,17 +263,17 @@ namespace ImageCompression.Algorithms.Wavelets
         {
             switch (waveletType)
             {
-                case WaveletType.Hoar1:
+                case WaveletType.Haar1:
                     return new[]
                     {
                         1.0/2,
                         1.0/2,
                     };
-                case WaveletType.Hoar2:
+                case WaveletType.Haar2:
                     return new[]
                     {
                         1.0/Math.Sqrt(2.0),
-                        1.0/Math.Sqrt(2)
+                        1.0/Math.Sqrt(2.0)
                     };
                 case WaveletType.D4:
                     return new[]

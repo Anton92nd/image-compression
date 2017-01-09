@@ -4,11 +4,11 @@ namespace ImageCompression.Algorithms.Wavelets
 {
     public enum WaveletType
     {
-        [Text("Hoar 0.5")]
-        Hoar1,
+        [Text("Haar 0.5")]
+        Haar1,
 
-        [Text("Hoar 1/sqrt(2)")]
-        Hoar2,
+        [Text("Haar 1/sqrt(2)")]
+        Haar2,
 
         [Text("Daubechies 4")]
         D4,
